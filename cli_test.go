@@ -35,8 +35,6 @@ func TestApp(t *testing.T) {
 			So(run, ShouldBeTrue)
 		})
 		Convey("Given flags", func() {
-			intValue := 0
-			strValue := ""
 			app.Main = Command{
 				Commands: []Command{{
 					Name: "cmd",
@@ -45,14 +43,16 @@ func TestApp(t *testing.T) {
 						StringOption{Name: "str"},
 					},
 					Action: func(c *Context) {
-						intValue = c.Int("int")
-						strValue = c.String("str")
+						So(c.Int("int"), ShouldEqual, 42)
+						So(c.Int("nonesuch"), ShouldEqual, 0)
+
+						So(c.String("str"), ShouldEqual, "42")
+						So(c.String("nonesuch"), ShouldEqual, "")
+
 					},
 				}},
 			}
 			app.Run([]string{"cmd", "--int", "42", "--str", "42"})
-			So(intValue, ShouldEqual, 42)
-			So(strValue, ShouldEqual, "42")
 		})
 	})
 }

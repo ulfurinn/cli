@@ -37,15 +37,6 @@ type Option interface {
 	//visible() bool
 }
 
-func flagSet(name string, flags []Option) *options.OptionSet {
-	set := options.NewOptionSet()
-
-	for _, f := range flags {
-		f.Apply(set)
-	}
-	return set
-}
-
 func eachName(longName string, fn func(string)) {
 	parts := strings.Split(longName, ",")
 	for _, name := range parts {
@@ -368,35 +359,35 @@ func (f IntOption) getName() string {
 // 	return f.Name
 // }
 
-// type Float64Option struct {
-// 	Name   string
-// 	Value  float64
-// 	Usage  string
-// 	EnvVar string
-// }
+type Float64Option struct {
+	Name   string
+	Value  float64
+	Usage  string
+	EnvVar string
+}
 
-// func (f Float64Option) String() string {
-// 	return withEnvHint(f.EnvVar, fmt.Sprintf("%s '%v'\t%v", prefixedNames(f.Name), f.Value, f.Usage))
-// }
+func (f Float64Option) String() string {
+	return withEnvHint(f.EnvVar, fmt.Sprintf("%s '%v'\t%v", prefixedNames(f.Name), f.Value, f.Usage))
+}
 
-// func (f Float64Option) Apply(set *options.OptionSet) {
-// 	if f.EnvVar != "" {
-// 		if envVal := os.Getenv(f.EnvVar); envVal != "" {
-// 			envValFloat, err := strconv.ParseFloat(envVal, 10)
-// 			if err == nil {
-// 				f.Value = float64(envValFloat)
-// 			}
-// 		}
-// 	}
+func (f Float64Option) Apply(set *options.OptionSet) {
+	if f.EnvVar != "" {
+		if envVal := os.Getenv(f.EnvVar); envVal != "" {
+			envValFloat, err := strconv.ParseFloat(envVal, 10)
+			if err == nil {
+				f.Value = float64(envValFloat)
+			}
+		}
+	}
 
-// 	eachName(f.Name, func(name string) {
-// 		set.Float64(name, f.Value, f.Usage)
-// 	})
-// }
+	eachName(f.Name, func(name string) {
+		set.Float64(name, f.Value, f.Usage)
+	})
+}
 
-// func (f Float64Option) getName() string {
-// 	return f.Name
-// }
+func (f Float64Option) getName() string {
+	return f.Name
+}
 
 func prefixFor(name string) (prefix string) {
 	if len(name) == 1 {
