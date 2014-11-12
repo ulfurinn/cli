@@ -42,6 +42,7 @@ func TestApp(t *testing.T) {
 						IntOption{Name: "int"},
 						StringOption{Name: "str"},
 						BoolOption{Name: "bool"},
+						Float64Option{Name: "float"},
 					},
 					Action: func(c *Context) {
 						So(c.Int("int"), ShouldEqual, 42)
@@ -53,10 +54,14 @@ func TestApp(t *testing.T) {
 						So(c.Bool("bool"), ShouldEqual, true)
 						So(c.Bool("nonesuch"), ShouldEqual, false)
 
+						So(c.Float64("float"), ShouldEqual, 42.42)
+						So(c.Float64("nonesuch"), ShouldEqual, 0.0)
+
 					},
 				}},
 			}
-			app.Run([]string{"cmd", "--int", "42", "--str", "42", "--bool", "true"})
+			err := app.Run([]string{"cmd", "--int", "42", "--str", "42", "--bool", "--float", "42.42"})
+			So(err, ShouldBeNil)
 		})
 	})
 }

@@ -29,11 +29,13 @@ func (c *Command) FindCommand(ctx *Context) {
 }
 
 // Invokes the command given the context, parses ctx.Args() to generate command-specific flags
-func (c *Command) Run(ctx *Context) error {
+func (c *Command) Run(ctx *Context) (err error) {
 	ctx.setupOptions(c.Options)
-	ctx.parseOptions()
+	if err = ctx.parseOptions(); err != nil {
+		return
+	}
 	if c.Action != nil {
 		c.Action(ctx)
 	}
-	return nil
+	return
 }

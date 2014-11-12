@@ -19,16 +19,18 @@ func (c *Context) String(name string) (v string) {
 	}
 	return
 }
+
 func (c *Context) Bool(name string) (v bool) {
 	opt := c.options.Lookup(name)
 	if opt == nil {
 		return
 	}
-	if strOpt, ok := opt.Value.(*options.BoolValue); ok && strOpt != nil {
-		v = bool(*strOpt)
+	if boolOpt, ok := opt.Value.(*options.BoolValue); ok && boolOpt != nil {
+		v = bool(*boolOpt)
 	}
 	return
 }
+
 func (c *Context) Int(name string) (v int) {
 	opt := c.options.Lookup(name)
 	if opt == nil {
@@ -39,6 +41,18 @@ func (c *Context) Int(name string) (v int) {
 	}
 	return
 }
+
+func (c *Context) Float64(name string) (v float64) {
+	opt := c.options.Lookup(name)
+	if opt == nil {
+		return
+	}
+	if floatOpt, ok := opt.Value.(*options.Float64Value); ok && floatOpt != nil {
+		v = float64(*floatOpt)
+	}
+	return
+}
+
 func (c *Context) Command() Command { return c.commands[len(c.commands)-1] }
 
 func (c *Context) setupOptions(opts []Option) {
