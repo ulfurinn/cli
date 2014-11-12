@@ -19,7 +19,16 @@ func (c *Context) String(name string) (v string) {
 	}
 	return
 }
-func (c *Context) Bool(string) bool { return false }
+func (c *Context) Bool(name string) (v bool) {
+	opt := c.options.Lookup(name)
+	if opt == nil {
+		return
+	}
+	if strOpt, ok := opt.Value.(*options.BoolValue); ok && strOpt != nil {
+		v = bool(*strOpt)
+	}
+	return
+}
 func (c *Context) Int(name string) (v int) {
 	opt := c.options.Lookup(name)
 	if opt == nil {

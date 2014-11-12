@@ -41,6 +41,7 @@ func TestApp(t *testing.T) {
 					Options: []Option{
 						IntOption{Name: "int"},
 						StringOption{Name: "str"},
+						BoolOption{Name: "bool"},
 					},
 					Action: func(c *Context) {
 						So(c.Int("int"), ShouldEqual, 42)
@@ -49,10 +50,13 @@ func TestApp(t *testing.T) {
 						So(c.String("str"), ShouldEqual, "42")
 						So(c.String("nonesuch"), ShouldEqual, "")
 
+						So(c.Bool("bool"), ShouldEqual, true)
+						So(c.Bool("nonesuch"), ShouldEqual, false)
+
 					},
 				}},
 			}
-			app.Run([]string{"cmd", "--int", "42", "--str", "42"})
+			app.Run([]string{"cmd", "--int", "42", "--str", "42", "--bool", "true"})
 		})
 	})
 }

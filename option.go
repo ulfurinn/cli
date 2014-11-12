@@ -194,38 +194,38 @@ func eachName(longName string, fn func(string)) {
 
 // func (f IntSliceOption) visible() bool { return !f.Hidden }
 
-// type BoolOption struct {
-// 	Name   string
-// 	Usage  string
-// 	EnvVar string
-// 	Hidden bool
-// }
+type BoolOption struct {
+	Name   string
+	Usage  string
+	EnvVar string
+	Hidden bool
+}
 
-// func (f BoolOption) String() string {
-// 	return withEnvHint(f.EnvVar, fmt.Sprintf("%s\t%v", prefixedNames(f.Name), f.Usage))
-// }
+func (f BoolOption) String() string {
+	return withEnvHint(f.EnvVar, fmt.Sprintf("%s\t%v", prefixedNames(f.Name), f.Usage))
+}
 
-// func (f BoolOption) Apply(set *options.OptionSet) {
-// 	val := false
-// 	if f.EnvVar != "" {
-// 		if envVal := os.Getenv(f.EnvVar); envVal != "" {
-// 			envValBool, err := strconv.ParseBool(envVal)
-// 			if err == nil {
-// 				val = envValBool
-// 			}
-// 		}
-// 	}
+func (f BoolOption) Apply(set *options.OptionSet) {
+	val := false
+	if f.EnvVar != "" {
+		if envVal := os.Getenv(f.EnvVar); envVal != "" {
+			envValBool, err := strconv.ParseBool(envVal)
+			if err == nil {
+				val = envValBool
+			}
+		}
+	}
 
-// 	eachName(f.Name, func(name string) {
-// 		set.Bool(name, val, f.Usage)
-// 	})
-// }
+	eachName(f.Name, func(name string) {
+		set.Bool(name, val, f.Usage)
+	})
+}
 
-// func (f BoolOption) getName() string {
-// 	return f.Name
-// }
+func (f BoolOption) getName() string {
+	return f.Name
+}
 
-// func (f BoolOption) visible() bool { return !f.Hidden }
+func (f BoolOption) visible() bool { return !f.Hidden }
 
 // type BoolTOption struct {
 // 	Name   string
