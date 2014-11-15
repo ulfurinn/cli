@@ -200,6 +200,7 @@ func eachName(longName string, fn func(string)) {
 
 type BoolOption struct {
 	Name   string
+	Value  bool
 	Usage  string
 	EnvVar string
 	Hidden bool
@@ -214,18 +215,17 @@ func (f BoolOption) CompletionStrings() []string {
 }
 
 func (f BoolOption) Apply(set *options.OptionSet) {
-	val := false
 	if f.EnvVar != "" {
 		if envVal := os.Getenv(f.EnvVar); envVal != "" {
 			envValBool, err := strconv.ParseBool(envVal)
 			if err == nil {
-				val = envValBool
+				f.Value = envValBool
 			}
 		}
 	}
 
 	eachName(f.Name, func(name string) {
-		set.Bool(name, val, f.Usage)
+		set.Bool(name, f.Value, f.Usage)
 	})
 }
 
@@ -235,39 +235,6 @@ func (f BoolOption) getName() string {
 
 func (f BoolOption) visible() bool                       { return !f.Hidden }
 func (f BoolOption) completion() func(*Context) []string { return nil }
-
-// type BoolTOption struct {
-// 	Name   string
-// 	Usage  string
-// 	EnvVar string
-// 	Hidden bool
-// }
-
-// func (f BoolTOption) String() string {
-// 	return withEnvHint(f.EnvVar, fmt.Sprintf("%s\t%v", prefixedNames(f.Name), f.Usage))
-// }
-
-// func (f BoolTOption) Apply(set *options.OptionSet) {
-// 	val := true
-// 	if f.EnvVar != "" {
-// 		if envVal := os.Getenv(f.EnvVar); envVal != "" {
-// 			envValBool, err := strconv.ParseBool(envVal)
-// 			if err == nil {
-// 				val = envValBool
-// 			}
-// 		}
-// 	}
-
-// 	eachName(f.Name, func(name string) {
-// 		set.Bool(name, val, f.Usage)
-// 	})
-// }
-
-// func (f BoolTOption) getName() string {
-// 	return f.Name
-// }
-
-// func (f BoolTOption) visible() bool { return !f.Hidden }
 
 type StringOption struct {
 	Name       string
