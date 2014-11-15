@@ -101,7 +101,8 @@ func TestApp(t *testing.T) {
 						So(b.String(), ShouldEqual, "sub11\n")
 					})
 					Convey("Flag completion", func() {
-						app.Run([]string{"--string"})
+						err := app.Run([]string{"--string"})
+						So(err, ShouldBeNil)
 						So(b.String(), ShouldEqual, "a\nb\n")
 					})
 				})

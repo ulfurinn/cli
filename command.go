@@ -42,6 +42,7 @@ func (c *Command) Run(ctx *Context) (err error) {
 	if completion {
 		if err == nil || ctx.options.MissingValue != nil {
 			c.showCompletion(ctx)
+			err = nil
 		}
 		return
 	}
