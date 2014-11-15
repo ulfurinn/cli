@@ -1,18 +1,23 @@
 package cli
 
-import "os"
+import (
+	"io"
+	"os"
+)
 
 type App struct {
-	EnableBashCompletion bool
-	HideHelp             bool
-	Name                 string
-	Usage                string
-	Main                 Command
+	EnableShellCompletion bool
+	HideHelp              bool
+	Name                  string
+	Usage                 string
+	Main                  Command
+	Out                   io.Writer
 }
 
 func NewApp() *App {
 	return &App{
 		Name: os.Args[0],
+		Out:  os.Stdout,
 	}
 }
 

@@ -1,6 +1,8 @@
 package cli_test
 
 import (
+	"bytes"
+	"os"
 	"testing"
 	. "bitbucket.org/ulfurinn/cli"
 	. "github.com/smartystreets/goconvey/convey"
@@ -9,6 +11,7 @@ import (
 func TestApp(t *testing.T) {
 	Convey("Given an app", t, func() {
 		app := NewApp()
+		app.EnableShellCompletion = true
 		Convey("Can run a simple command", func() {
 			run := false
 			app.Main = Command{
@@ -62,6 +65,48 @@ func TestApp(t *testing.T) {
 			}
 			err := app.Run([]string{"cmd", "--int", "42", "--str", "42", "--bool", "--float", "42.42"})
 			So(err, ShouldBeNil)
+			Convey("Shell completion", func() {
+				os.Setenv("_CLI_SHELL_COMPLETION", "true")
+				var b bytes.Buffer
+				app.Out = &b
+				Convey("Empty", func() {
+					app.Main = Command{}
+					app.Run([]string{})
+					So(b.String(), ShouldEqual, "")
+				})
+				Convey("Commands and flags", func() {
+					app.Main = Command{
+						Commands: []Command{{
+							Name: "cmd1",
+							Commands: []Command{{
+								Name: "sub11",
+							}},
+						}, {
+							Name: "cmd2",
+						}},
+						Options: []Option{
+							IntOption{Name: "int"},
+							StringOption{
+								Name:       "string",
+								Completion: func(*Context) []string { return []string{"a", "b"} },
+							},
+						},
+					}
+					Convey("Top level", func() {
+						app.Run([]string{})
+						So(b.String(), ShouldEqual, "cmd1\ncmd2\n--int\n--string\n")
+					})
+					Convey("Second level", func() {
+						app.Run([]string{"cmd1"})
+						So(b.String(), ShouldEqual, "sub11\n")
+					})
+					Convey("Flag completion", func() {
+						app.Run([]string{"--string"})
+						So(b.String(), ShouldEqual, "a\nb\n")
+					})
+				})
+				os.Setenv("_CLI_SHELL_COMPLETION", "false")
+			})
 		})
 	})
 }

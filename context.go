@@ -7,6 +7,7 @@ type Context struct {
 	args     []string
 	commands []Command
 	options  *options.OptionSet
+	parseError error
 }
 
 func (c *Context) String(name string) (v string) {
@@ -62,8 +63,25 @@ func (c *Context) setupOptions(opts []Option) {
 	for _, opt := range opts {
 		opt.Apply(c.options)
 	}
+	HelpOption.Apply(c.options)
+	if c.app.EnableShellCompletion {
+		ShellCompletionOption.Apply(c.options)
+	}
 }
 
-func (c *Context) parseOptions() error {
-	return c.options.Parse(c.args)
+func (c *Context) parseOptions() (err error) {
+	err = c.options.Parse(c.args)
+	c.parseError = err
+	return
+}
+
+func (c *Context) findOption(name string) (option Option) {
+	for _, cmd := range c.commands {
+		for _, opt := range cmd.Options {
+			if opt.getName() == name {
+				option = opt
+			}
+		}
+	}
+	return
 }

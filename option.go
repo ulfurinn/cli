@@ -9,10 +9,12 @@ import (
 	"bitbucket.org/ulfurinn/options"
 )
 
-// // This flag enables bash-completion for all commands and subcommands
-// var BashCompletionOption = BoolOption{
-// 	Name: "generate-bash-completion",
-// }
+// This flag enables bash-completion for all commands and subcommands
+var ShellCompletionOption = BoolOption{
+	Name:   "generate-shell-completion",
+	EnvVar: "_CLI_SHELL_COMPLETION",
+	Hidden: true,
+}
 
 // // This flag prints the version for the application
 // var VersionOption = BoolOption{
@@ -20,20 +22,22 @@ import (
 // 	Usage: "print the version",
 // }
 
-// // This flag prints the help for all commands and subcommands
-// var HelpOption = BoolOption{
-// 	Name:  "help, h",
-// 	Usage: "show help",
-// }
+// This flag prints the help for all commands and subcommands
+var HelpOption = BoolOption{
+	Name:  "help, h",
+	Usage: "show help",
+}
 
 // Option is a common interface related to parsing flags in cli.
 // For more advanced flag parsing techniques, it is recomended that
 // this interface be implemented.
 type Option interface {
-	fmt.Stringer
+	HelpString() string
+	CompletionStrings() []string
 	// Apply Option settings to the given flag set
 	Apply(*options.OptionSet)
 	getName() string
+	completion() func(*Context) []string
 	//visible() bool
 }
 
@@ -201,8 +205,12 @@ type BoolOption struct {
 	Hidden bool
 }
 
-func (f BoolOption) String() string {
+func (f BoolOption) HelpString() string {
 	return withEnvHint(f.EnvVar, fmt.Sprintf("%s\t%v", prefixedNames(f.Name), f.Usage))
+}
+
+func (f BoolOption) CompletionStrings() []string {
+	return []string{prefixedNames(f.Name)}
 }
 
 func (f BoolOption) Apply(set *options.OptionSet) {
@@ -225,7 +233,8 @@ func (f BoolOption) getName() string {
 	return f.Name
 }
 
-func (f BoolOption) visible() bool { return !f.Hidden }
+func (f BoolOption) visible() bool                       { return !f.Hidden }
+func (f BoolOption) completion() func(*Context) []string { return nil }
 
 // type BoolTOption struct {
 // 	Name   string
@@ -261,14 +270,15 @@ func (f BoolOption) visible() bool { return !f.Hidden }
 // func (f BoolTOption) visible() bool { return !f.Hidden }
 
 type StringOption struct {
-	Name   string
-	Value  string
-	Usage  string
-	EnvVar string
-	Hidden bool
+	Name       string
+	Value      string
+	Usage      string
+	EnvVar     string
+	Hidden     bool
+	Completion func(*Context) []string
 }
 
-func (f StringOption) String() string {
+func (f StringOption) HelpString() string {
 	var fmtString string
 	fmtString = "%s %v\t%v"
 
@@ -279,6 +289,10 @@ func (f StringOption) String() string {
 	}
 
 	return withEnvHint(f.EnvVar, fmt.Sprintf(fmtString, prefixedNames(f.Name), f.Value, f.Usage))
+}
+
+func (f StringOption) CompletionStrings() []string {
+	return []string{prefixedNames(f.Name)}
 }
 
 func (f StringOption) Apply(set *options.OptionSet) {
@@ -297,17 +311,23 @@ func (f StringOption) getName() string {
 	return f.Name
 }
 
-func (f StringOption) visible() bool { return !f.Hidden }
+func (f StringOption) visible() bool                       { return !f.Hidden }
+func (f StringOption) completion() func(*Context) []string { return f.Completion }
 
 type IntOption struct {
-	Name   string
-	Value  int
-	Usage  string
-	EnvVar string
+	Name       string
+	Value      int
+	Usage      string
+	EnvVar     string
+	Completion func(*Context) []string
 }
 
-func (f IntOption) String() string {
+func (f IntOption) HelpString() string {
 	return withEnvHint(f.EnvVar, fmt.Sprintf("%s '%v'\t%v", prefixedNames(f.Name), f.Value, f.Usage))
+}
+
+func (f IntOption) CompletionStrings() []string {
+	return []string{prefixedNames(f.Name)}
 }
 
 func (f IntOption) Apply(set *options.OptionSet) {
@@ -328,6 +348,7 @@ func (f IntOption) Apply(set *options.OptionSet) {
 func (f IntOption) getName() string {
 	return f.Name
 }
+func (f IntOption) completion() func(*Context) []string { return f.Completion }
 
 // type DurationOption struct {
 // 	Name   string
@@ -360,14 +381,19 @@ func (f IntOption) getName() string {
 // }
 
 type Float64Option struct {
-	Name   string
-	Value  float64
-	Usage  string
-	EnvVar string
+	Name       string
+	Value      float64
+	Usage      string
+	EnvVar     string
+	Completion func(*Context) []string
 }
 
-func (f Float64Option) String() string {
+func (f Float64Option) HelpString() string {
 	return withEnvHint(f.EnvVar, fmt.Sprintf("%s '%v'\t%v", prefixedNames(f.Name), f.Value, f.Usage))
+}
+
+func (f Float64Option) CompletionStrings() []string {
+	return []string{prefixedNames(f.Name)}
 }
 
 func (f Float64Option) Apply(set *options.OptionSet) {
@@ -388,6 +414,7 @@ func (f Float64Option) Apply(set *options.OptionSet) {
 func (f Float64Option) getName() string {
 	return f.Name
 }
+func (f Float64Option) completion() func(*Context) []string { return f.Completion }
 
 func prefixFor(name string) (prefix string) {
 	if len(name) == 1 {
