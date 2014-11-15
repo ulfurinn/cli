@@ -11,6 +11,7 @@ import (
 func TestApp(t *testing.T) {
 	Convey("Given an app", t, func() {
 		app := NewApp()
+		app.Name = "testapp"
 		app.EnableShellCompletion = true
 		Convey("Can run a simple command", func() {
 			run := false
@@ -107,6 +108,37 @@ func TestApp(t *testing.T) {
 					})
 				})
 				os.Setenv("_CLI_SHELL_COMPLETION", "false")
+			})
+		})
+		Convey("Help", func() {
+			var b bytes.Buffer
+			app.Out = &b
+			app.Main = Command{
+				Usage: "app usage",
+				Commands: []Command{{
+					Name:  "cmd1",
+					Usage: "cmd1 usage",
+					Commands: []Command{{
+						Name: "sub1",
+					}},
+				}, {
+					Name: "cmd2",
+				}},
+				Options: []Option{
+					IntOption{Name: "int"},
+					StringOption{
+						Name:       "string",
+						Completion: func(*Context) []string { return []string{"a", "b"} },
+					},
+				},
+			}
+			Convey("Root", func() {
+				app.Run([]string{"help"})
+				So(b.String(), ShouldEqual, "\nUsage: testapp\n\napp usage\n\nSubcommands:\n  cmd1 - cmd1 usage\n  cmd2\n")
+			})
+			Convey("Subcommand", func() {
+				app.Run([]string{"cmd1", "help"})
+				So(b.String(), ShouldEqual, "\nUsage: testapp cmd1\n\ncmd1 usage\n\nSubcommands:\n  sub1\n")
 			})
 		})
 	})

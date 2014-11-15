@@ -25,6 +25,11 @@ func (c *Command) FindCommand(ctx *Context) {
 		return
 	}
 	a := ctx.args[0]
+	if a == "help" {
+		ctx.commands = append(ctx.commands, HelpCommand)
+		ctx.args = ctx.args[1:]
+		return
+	}
 	for i := range c.Commands {
 		if c.Commands[i].HasName(a) {
 			ctx.args = ctx.args[1:]
@@ -49,6 +54,8 @@ func (c *Command) Run(ctx *Context) (err error) {
 
 	if err == nil && c.Action != nil {
 		c.Action(ctx)
+	} else {
+		return HelpCommand.Run(ctx)
 	}
 
 	return

@@ -22,12 +22,6 @@ var ShellCompletionOption = BoolOption{
 // 	Usage: "print the version",
 // }
 
-// This flag prints the help for all commands and subcommands
-var HelpOption = BoolOption{
-	Name:  "help, h",
-	Usage: "show help",
-}
-
 // Option is a common interface related to parsing flags in cli.
 // For more advanced flag parsing techniques, it is recomended that
 // this interface be implemented.
