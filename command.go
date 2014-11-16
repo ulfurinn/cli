@@ -43,6 +43,7 @@ func (c *Command) Run(ctx *Context) (err error) {
 	ctx.setupOptions(c.Options)
 	err = ctx.parseOptions()
 	completion := ctx.Bool("generate-shell-completion")
+	help := ctx.Bool("help")
 
 	if completion {
 		if err == nil || ctx.options.MissingValue != nil {
@@ -52,10 +53,13 @@ func (c *Command) Run(ctx *Context) (err error) {
 		return
 	}
 
+	if help {
+		helpAction(ctx)
+		return
+	}
+
 	if err == nil && c.Action != nil {
 		c.Action(ctx)
-	} else {
-		return HelpCommand.Run(ctx)
 	}
 
 	return

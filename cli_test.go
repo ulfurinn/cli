@@ -132,13 +132,25 @@ func TestApp(t *testing.T) {
 					},
 				},
 			}
-			Convey("Root", func() {
-				app.Run([]string{"help"})
-				So(b.String(), ShouldEqual, "\nUsage: testapp\n\napp usage\n\nSubcommands:\n  cmd1 - cmd1 usage\n  cmd2\n")
+			Convey("Using a subcommand", func() {
+				Convey("Root", func() {
+					app.Run([]string{"help"})
+					So(b.String(), ShouldEqual, "\nUsage: testapp\n\napp usage\n\nSubcommands:\n  cmd1 - cmd1 usage\n  cmd2\n")
+				})
+				Convey("Subcommand", func() {
+					app.Run([]string{"cmd1", "help"})
+					So(b.String(), ShouldEqual, "\nUsage: testapp cmd1\n\ncmd1 usage\n\nSubcommands:\n  sub1\n")
+				})
 			})
-			Convey("Subcommand", func() {
-				app.Run([]string{"cmd1", "help"})
-				So(b.String(), ShouldEqual, "\nUsage: testapp cmd1\n\ncmd1 usage\n\nSubcommands:\n  sub1\n")
+			Convey("Using an option", func() {
+				Convey("Root", func() {
+					app.Run([]string{"--help"})
+					So(b.String(), ShouldEqual, "\nUsage: testapp\n\napp usage\n\nSubcommands:\n  cmd1 - cmd1 usage\n  cmd2\n")
+				})
+				Convey("Subcommand", func() {
+					app.Run([]string{"cmd1", "--help"})
+					So(b.String(), ShouldEqual, "\nUsage: testapp cmd1\n\ncmd1 usage\n\nSubcommands:\n  sub1\n")
+				})
 			})
 		})
 	})
