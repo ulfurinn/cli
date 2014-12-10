@@ -94,3 +94,7 @@ func showCompletion(out io.Writer, strings []string) {
 		}
 	}
 }
+
+func StdCompletion() string {
+	return "$stdcomp=-fd"
+}
