@@ -14,7 +14,7 @@ Usage: {{.AppName}}{{.CommandList}}{{if .Usage}}
 {{.Usage}}{{end}}{{if .Subcommands}}
 
 Subcommands:{{range .Subcommands}}
-  {{.Name}}{{if .Usage}} - {{.Usage}}{{end}}{{end}}{{end}}{{if .Options}}
+  {{.Name}}{{if .Usage}}    {{.Usage}}{{end}}{{end}}{{end}}{{if .Options}}
 
 Options:{{range .Options}}
   {{.Name}}{{if .Usage}}    {{.Usage}}{{end}}{{end}}{{end}}
@@ -103,8 +103,9 @@ func (h *helpContext) setup(ctx *Context) {
 			maxOptLength = len(opt.Name)
 		}
 	}
-	for _, cmd := range h.Subcommands {
+	for k, cmd := range h.Subcommands {
 		cmd.Name = fmt.Sprintf(fmt.Sprintf("%%-%ds", maxSubLength), cmd.Name)
+		h.Subcommands[k] = cmd
 	}
 	for k, opt := range h.Options {
 		opt.Name = fmt.Sprintf(fmt.Sprintf("%%-%ds", maxOptLength), opt.Name)
