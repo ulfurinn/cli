@@ -89,7 +89,7 @@ func TestApp(t *testing.T) {
 							IntOption{Name: "int"},
 							StringOption{
 								Name:       "string",
-								Completion: func(*Context) []string { return []string{"a", "b"} },
+								Completion: func(*Context, Option) []string { return []string{"a", "b"} },
 							},
 						},
 					}
@@ -128,7 +128,7 @@ func TestApp(t *testing.T) {
 					IntOption{Name: "int"},
 					StringOption{
 						Name:       "string",
-						Completion: func(*Context) []string { return []string{"a", "b"} },
+						Completion: func(*Context, Option) []string { return []string{"a", "b"} },
 					},
 				},
 			}

@@ -22,6 +22,8 @@ var ShellCompletionOption = BoolOption{
 // 	Usage: "print the version",
 // }
 
+type completionFunc func(*Context, Option) []string
+
 // Option is a common interface related to parsing flags in cli.
 // For more advanced flag parsing techniques, it is recomended that
 // this interface be implemented.
@@ -31,7 +33,7 @@ type Option interface {
 	// Apply Option settings to the given flag set
 	Apply(*options.OptionSet)
 	getName() string
-	completion() func(*Context) []string
+	completion() completionFunc
 	//visible() bool
 }
 
@@ -227,16 +229,17 @@ func (f BoolOption) getName() string {
 	return f.Name
 }
 
-func (f BoolOption) visible() bool                       { return !f.Hidden }
-func (f BoolOption) completion() func(*Context) []string { return nil }
+func (f BoolOption) visible() bool              { return !f.Hidden }
+func (f BoolOption) completion() completionFunc { return nil }
 
 type StringOption struct {
 	Name       string
 	Value      string
+	ValueList  []string
 	Usage      string
 	EnvVar     string
 	Hidden     bool
-	Completion func(*Context) []string
+	Completion completionFunc
 }
 
 func (f StringOption) HelpString() string {
@@ -272,15 +275,15 @@ func (f StringOption) getName() string {
 	return f.Name
 }
 
-func (f StringOption) visible() bool                       { return !f.Hidden }
-func (f StringOption) completion() func(*Context) []string { return f.Completion }
+func (f StringOption) visible() bool              { return !f.Hidden }
+func (f StringOption) completion() completionFunc { return f.Completion }
 
 type IntOption struct {
 	Name       string
 	Value      int
 	Usage      string
 	EnvVar     string
-	Completion func(*Context) []string
+	Completion completionFunc
 }
 
 func (f IntOption) HelpString() string {
@@ -309,7 +312,7 @@ func (f IntOption) Apply(set *options.OptionSet) {
 func (f IntOption) getName() string {
 	return f.Name
 }
-func (f IntOption) completion() func(*Context) []string { return f.Completion }
+func (f IntOption) completion() completionFunc { return f.Completion }
 
 // type DurationOption struct {
 // 	Name   string
@@ -346,7 +349,7 @@ type Float64Option struct {
 	Value      float64
 	Usage      string
 	EnvVar     string
-	Completion func(*Context) []string
+	Completion completionFunc
 }
 
 func (f Float64Option) HelpString() string {
@@ -375,7 +378,7 @@ func (f Float64Option) Apply(set *options.OptionSet) {
 func (f Float64Option) getName() string {
 	return f.Name
 }
-func (f Float64Option) completion() func(*Context) []string { return f.Completion }
+func (f Float64Option) completion() completionFunc { return f.Completion }
 
 func prefixFor(name string) (prefix string) {
 	if len(name) == 1 {

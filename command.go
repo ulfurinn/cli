@@ -70,7 +70,7 @@ func (c *Command) showCompletion(ctx *Context) {
 	if missing := ctx.options.MissingValue; missing != nil {
 		opt := ctx.findOption(missing.Name)
 		if f := opt.completion(); f != nil {
-			showCompletion(ctx.app.Out, f(ctx))
+			showCompletion(ctx.app.Out, f(ctx, opt))
 			return
 		}
 	}
@@ -95,6 +95,19 @@ func showCompletion(out io.Writer, strings []string) {
 	}
 }
 
-func StdCompletion() string {
+func StdCompletionFlags() string {
 	return "$stdcomp=-fd"
+}
+
+func StdCompletion(*Context, Option) []string {
+	return []string{StdCompletionFlags()}
+}
+
+func ValueListCompletion(ctx *Context, opt Option) []string {
+	switch o := opt.(type) {
+	case StringOption:
+		return o.ValueList
+	default:
+		return []string{}
+	}
 }
