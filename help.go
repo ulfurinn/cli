@@ -2,6 +2,7 @@ package cli
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 
 	"text/template"
@@ -13,8 +14,16 @@ Usage: {{.AppName}}{{.CommandList}}{{if .Usage}}
 {{.Usage}}{{end}}{{if .Subcommands}}
 
 Subcommands:{{range .Subcommands}}
-  {{.Name}}{{if .Usage}} - {{.Usage}}{{end}}{{end}}{{end}}
+  {{.Name}}{{if .Usage}} - {{.Usage}}{{end}}{{end}}{{end}}{{if .Options}}
+
+Options:{{range .Options}}
+  {{.Name}}{{if .Usage}}    {{.Usage}}{{end}}{{end}}{{end}}
 `
+
+type helpOption struct {
+	Name  string
+	Usage string
+}
 
 type helpContext struct {
 	AppName     string
@@ -24,6 +33,7 @@ type helpContext struct {
 		Name  string
 		Usage string
 	}
+	Options []helpOption
 }
 
 // This flag prints the help for all commands and subcommands
@@ -64,17 +74,40 @@ func (h *helpContext) setup(ctx *Context) {
 	}
 	activeCommand := usedCommands[len(usedCommands)-1]
 	h.Usage = activeCommand.Usage
-	maxLength := 0
+	maxSubLength := 0
+	maxOptLength := 0
 	for _, cmd := range activeCommand.Commands {
 		h.Subcommands = append(h.Subcommands, struct {
 			Name  string
 			Usage string
 		}{cmd.Name, cmd.Usage})
-		if len(cmd.Name) > maxLength {
-			maxLength = len(cmd.Name)
+		if len(cmd.Name) > maxSubLength {
+			maxSubLength = len(cmd.Name)
+		}
+	}
+	opts := map[string]helpOption{}
+	for _, cmd := range usedCommands {
+		for _, opt := range cmd.Options {
+			opts[opt.getName()] = helpOption{"--" + opt.getName(), opt.getUsage()}
+		}
+	}
+	optKeys := []string{}
+	for k := range opts {
+		optKeys = append(optKeys, k)
+	}
+	sort.Strings(optKeys)
+	for _, key := range optKeys {
+		opt := opts[key]
+		h.Options = append(h.Options, opt)
+		if len(opt.Name) > maxOptLength {
+			maxOptLength = len(opt.Name)
 		}
 	}
 	for _, cmd := range h.Subcommands {
-		cmd.Name = fmt.Sprintf(fmt.Sprintf("%%%d%%s", maxLength), cmd.Name)
+		cmd.Name = fmt.Sprintf(fmt.Sprintf("%%-%ds", maxSubLength), cmd.Name)
+	}
+	for k, opt := range h.Options {
+		opt.Name = fmt.Sprintf(fmt.Sprintf("%%-%ds", maxOptLength), opt.Name)
+		h.Options[k] = opt
 	}
 }

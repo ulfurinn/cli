@@ -33,6 +33,7 @@ type Option interface {
 	// Apply Option settings to the given flag set
 	Apply(*options.OptionSet)
 	getName() string
+	getUsage() string
 	completion() completionFunc
 	//visible() bool
 }
@@ -229,6 +230,14 @@ func (f BoolOption) getName() string {
 	return f.Name
 }
 
+func (f BoolOption) getUsage() string {
+	if f.Usage == "" {
+		return fmt.Sprintf("default = %v", f.Value)
+	} else {
+		return fmt.Sprintf("%s; default = %v", f.Usage, f.Value)
+	}
+}
+
 func (f BoolOption) visible() bool              { return !f.Hidden }
 func (f BoolOption) completion() completionFunc { return nil }
 
@@ -275,6 +284,14 @@ func (f StringOption) getName() string {
 	return f.Name
 }
 
+func (f StringOption) getUsage() string {
+	if f.Usage == "" {
+		return fmt.Sprintf("default = %q", f.Value)
+	} else {
+		return fmt.Sprintf("%s; default = %q", f.Usage, f.Value)
+	}
+}
+
 func (f StringOption) visible() bool              { return !f.Hidden }
 func (f StringOption) completion() completionFunc { return f.Completion }
 
@@ -312,6 +329,15 @@ func (f IntOption) Apply(set *options.OptionSet) {
 func (f IntOption) getName() string {
 	return f.Name
 }
+
+func (f IntOption) getUsage() string {
+	if f.Usage == "" {
+		return fmt.Sprintf("default = %v", f.Value)
+	} else {
+		return fmt.Sprintf("%s; default = %v", f.Usage, f.Value)
+	}
+}
+
 func (f IntOption) completion() completionFunc { return f.Completion }
 
 // type DurationOption struct {
@@ -378,6 +404,15 @@ func (f Float64Option) Apply(set *options.OptionSet) {
 func (f Float64Option) getName() string {
 	return f.Name
 }
+
+func (f Float64Option) getUsage() string {
+	if f.Usage == "" {
+		return fmt.Sprintf("default = %v", f.Value)
+	} else {
+		return fmt.Sprintf("%s; default = %v", f.Usage, f.Value)
+	}
+}
+
 func (f Float64Option) completion() completionFunc { return f.Completion }
 
 func prefixFor(name string) (prefix string) {
