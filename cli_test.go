@@ -18,7 +18,7 @@ func TestApp(t *testing.T) {
 			app.Main = Command{
 				Commands: []Command{{
 					Name:   "testcmd",
-					Action: func(c *Context) { run = true },
+					Action: func(c *Context) error { run = true; return nil },
 				}},
 			}
 			app.Run([]string{"testcmd"})
@@ -31,7 +31,7 @@ func TestApp(t *testing.T) {
 					Name: "testcmd",
 					Commands: []Command{{
 						Name:   "sub",
-						Action: func(c *Context) { run = true },
+						Action: func(c *Context) error { run = true; return nil },
 					}},
 				}},
 			}
@@ -48,7 +48,7 @@ func TestApp(t *testing.T) {
 						BoolOption{Name: "bool"},
 						Float64Option{Name: "float"},
 					},
-					Action: func(c *Context) {
+					Action: func(c *Context) error {
 						So(c.Int("int"), ShouldEqual, 42)
 						So(c.Int("nonesuch"), ShouldEqual, 0)
 
@@ -61,6 +61,7 @@ func TestApp(t *testing.T) {
 						So(c.Float64("float"), ShouldEqual, 42.42)
 						So(c.Float64("nonesuch"), ShouldEqual, 0.0)
 
+						return nil
 					},
 				}},
 			}

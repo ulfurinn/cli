@@ -47,11 +47,11 @@ var HelpCommand = Command{
 	Action: helpAction,
 }
 
-func helpAction(ctx *Context) {
+func helpAction(ctx *Context) error {
 	tpl, _ := template.New("help").Parse(tplSource)
 	helpCtx := helpContext{}
 	helpCtx.setup(ctx)
-	tpl.Execute(ctx.app.Out, helpCtx)
+	return tpl.Execute(ctx.app.Out, helpCtx)
 }
 
 func (h *helpContext) setup(ctx *Context) {

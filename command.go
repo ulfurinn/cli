@@ -12,7 +12,7 @@ type Command struct {
 	ShortName string
 	Usage     string
 	Before    func(*Context) error
-	Action    func(*Context)
+	Action    func(*Context) error
 }
 
 func (c *Command) HasName(name string) bool {
@@ -54,12 +54,12 @@ func (c *Command) Run(ctx *Context) (err error) {
 	}
 
 	if help {
-		helpAction(ctx)
+		err = helpAction(ctx)
 		return
 	}
 
 	if err == nil && c.Action != nil {
-		c.Action(ctx)
+		err = c.Action(ctx)
 	}
 
 	return
