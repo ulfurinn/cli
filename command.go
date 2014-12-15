@@ -58,6 +58,14 @@ func (c *Command) Run(ctx *Context) (err error) {
 		return
 	}
 
+	for _, cmd := range ctx.commands {
+		if cmd.Before != nil {
+			if err := cmd.Before(ctx); err != nil {
+				return err
+			}
+		}
+	}
+
 	if err == nil && c.Action != nil {
 		err = c.Action(ctx)
 	}
