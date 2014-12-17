@@ -3,6 +3,7 @@ package cli
 import (
 	"fmt"
 	"io"
+	"strings"
 )
 
 type Command struct {
@@ -56,6 +57,11 @@ func (c *Command) Run(ctx *Context) (err error) {
 	if help {
 		err = helpAction(ctx)
 		return
+	}
+
+	err = ctx.validateOptions(c.Options)
+	if err != nil {
+		return err
 	}
 
 	for _, cmd := range ctx.commands {
@@ -117,5 +123,24 @@ func ValueListCompletion(ctx *Context, opt Option) []string {
 		return o.ValueList
 	default:
 		return []string{}
+	}
+}
+
+func ValueListValidation(ctx *Context, opt Option) error {
+	// default values always pass
+	if lowOpt := ctx.options.Lookup(opt.getName()); lowOpt != nil && !lowOpt.Value.Explicit() {
+		return nil
+	}
+	switch o := opt.(type) {
+	case StringOption:
+		givenValue := ctx.String(o.Name)
+		for _, allowedValue := range o.ValueList {
+			if givenValue == allowedValue {
+				return nil
+			}
+		}
+		return fmt.Errorf("%s accepts one of the following values: %s", o.Name, strings.Join(o.ValueList, ","))
+	default:
+		return nil
 	}
 }

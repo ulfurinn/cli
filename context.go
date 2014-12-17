@@ -3,10 +3,10 @@ package cli
 import "bitbucket.org/ulfurinn/options"
 
 type Context struct {
-	app      *App
-	args     []string
-	commands []Command
-	options  *options.OptionSet
+	app        *App
+	args       []string
+	commands   []Command
+	options    *options.OptionSet
 	parseError error
 }
 
@@ -73,6 +73,17 @@ func (c *Context) parseOptions() (err error) {
 	err = c.options.Parse(c.args)
 	c.parseError = err
 	return
+}
+
+func (c *Context) validateOptions(opts []Option) error {
+	for _, opt := range opts {
+		if opt.validation() != nil {
+			if err := opt.validation()(c, opt); err != nil {
+				return nil
+			}
+		}
+	}
+	return nil
 }
 
 func (c *Context) findOption(name string) (option Option) {

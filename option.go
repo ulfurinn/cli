@@ -23,6 +23,7 @@ var ShellCompletionOption = BoolOption{
 // }
 
 type completionFunc func(*Context, Option) []string
+type validationFunc func(*Context, Option) error
 
 // Option is a common interface related to parsing flags in cli.
 // For more advanced flag parsing techniques, it is recomended that
@@ -35,6 +36,7 @@ type Option interface {
 	getName() string
 	getUsage() string
 	completion() completionFunc
+	validation() validationFunc
 	//visible() bool
 }
 
@@ -240,6 +242,7 @@ func (f BoolOption) getUsage() string {
 
 func (f BoolOption) visible() bool              { return !f.Hidden }
 func (f BoolOption) completion() completionFunc { return nil }
+func (f BoolOption) validation() validationFunc { return nil }
 
 type StringOption struct {
 	Name       string
@@ -249,6 +252,7 @@ type StringOption struct {
 	EnvVar     string
 	Hidden     bool
 	Completion completionFunc
+	Validation validationFunc
 }
 
 func (f StringOption) HelpString() string {
@@ -294,6 +298,7 @@ func (f StringOption) getUsage() string {
 
 func (f StringOption) visible() bool              { return !f.Hidden }
 func (f StringOption) completion() completionFunc { return f.Completion }
+func (f StringOption) validation() validationFunc { return f.Validation }
 
 type IntOption struct {
 	Name       string
@@ -339,6 +344,7 @@ func (f IntOption) getUsage() string {
 }
 
 func (f IntOption) completion() completionFunc { return f.Completion }
+func (f IntOption) validation() validationFunc { return nil }
 
 // type DurationOption struct {
 // 	Name   string
@@ -414,6 +420,7 @@ func (f Float64Option) getUsage() string {
 }
 
 func (f Float64Option) completion() completionFunc { return f.Completion }
+func (f Float64Option) validation() validationFunc { return nil }
 
 func prefixFor(name string) (prefix string) {
 	if len(name) == 1 {
