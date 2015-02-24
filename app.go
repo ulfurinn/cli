@@ -22,6 +22,7 @@ func NewApp() *App {
 }
 
 func (a *App) Run(arguments []string) error {
+	a.Main.appendHelp()
 	ctx := &Context{
 		app:  a,
 		args: arguments,

@@ -7,13 +7,14 @@ import (
 )
 
 type Command struct {
-	Commands  []Command
-	Options   []Option
-	Name      string
-	ShortName string
-	Usage     string
-	Before    func(*Context) error
-	Action    func(*Context) error
+	Commands   []Command
+	Options    []Option
+	Name       string
+	ShortName  string
+	Usage      string
+	Before     func(*Context) error
+	Action     func(*Context) error
+	Completion func(*Context)
 }
 
 func (c *Command) HasName(name string) bool {
@@ -26,17 +27,21 @@ func (c *Command) FindCommand(ctx *Context) {
 		return
 	}
 	a := ctx.args[0]
-	if a == "help" {
-		ctx.commands = append(ctx.commands, HelpCommand)
-		ctx.args = ctx.args[1:]
-		return
-	}
 	for i := range c.Commands {
 		if c.Commands[i].HasName(a) {
 			ctx.args = ctx.args[1:]
 			c.Commands[i].FindCommand(ctx)
 		}
 	}
+}
+
+func (c *Command) appendHelp() {
+	for _, com := range c.Commands {
+		if com.HasName("help") {
+			return
+		}
+	}
+	c.Commands = append(c.Commands, HelpCommand)
 }
 
 // Invokes the command given the context, parses ctx.Args() to generate command-specific flags
@@ -55,7 +60,7 @@ func (c *Command) Run(ctx *Context) (err error) {
 	}
 
 	if help {
-		err = helpAction(ctx)
+		err = helpOptionAction(ctx)
 		return
 	}
 
@@ -81,6 +86,10 @@ func (c *Command) Run(ctx *Context) (err error) {
 }
 
 func (c *Command) showCompletion(ctx *Context) {
+	if c.Completion != nil {
+		c.Completion(ctx)
+		return
+	}
 	if missing := ctx.options.MissingValue; missing != nil {
 		opt := ctx.findOption(missing.Name)
 		if f := opt.completion(); f != nil {
@@ -93,7 +102,9 @@ func (c *Command) showCompletion(ctx *Context) {
 	}
 	list := []string{}
 	for _, cmd := range c.Commands {
-		list = append(list, cmd.Name, cmd.ShortName)
+		if cmd.Name != "help" {
+			list = append(list, cmd.Name, cmd.ShortName)
+		}
 	}
 	for _, opt := range c.Options {
 		list = append(list, opt.CompletionStrings()...)

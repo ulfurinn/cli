@@ -42,25 +42,44 @@ var HelpOption = BoolOption{
 	Usage: "show help",
 }
 
-var HelpCommand = Command{
-	Name:   "help",
-	Action: helpAction,
+var HelpCommand Command
+
+func init() {
+	HelpCommand = Command{
+		Name:       "help",
+		Action:     helpCommandAction,
+		Completion: helpCompletion,
+	}
 }
 
-func helpAction(ctx *Context) error {
+func helpCommandAction(ctx *Context) error {
+	tpl, _ := template.New("help").Parse(tplSource)
+	helpCtx := helpContext{}
+	helpCtx.setupCommand(ctx)
+	return tpl.Execute(ctx.app.Out, helpCtx)
+}
+
+func helpOptionAction(ctx *Context) error {
 	tpl, _ := template.New("help").Parse(tplSource)
 	helpCtx := helpContext{}
 	helpCtx.setup(ctx)
 	return tpl.Execute(ctx.app.Out, helpCtx)
 }
 
+func (h *helpContext) setupCommand(ctx *Context) {
+	subctx := &Context{
+		app:  ctx.app,
+		args: ctx.args,
+	}
+	ctx.app.Main.FindCommand(subctx)
+	h.setup(subctx)
+}
+
 func (h *helpContext) setup(ctx *Context) {
 	h.AppName = ctx.app.Name
 	usedCommands := []Command{}
 	for _, cmd := range ctx.commands {
-		if cmd.Name != "help" {
-			usedCommands = append(usedCommands, cmd)
-		}
+		usedCommands = append(usedCommands, cmd)
 	}
 	cmdPath := []string{}
 	for i, cmd := range usedCommands {
@@ -111,4 +130,15 @@ func (h *helpContext) setup(ctx *Context) {
 		opt.Name = fmt.Sprintf(fmt.Sprintf("%%-%ds", maxOptLength), opt.Name)
 		h.Options[k] = opt
 	}
+}
+
+func helpCompletion(ctx *Context) {
+	subctx := &Context{
+		app:  ctx.app,
+		args: ctx.args,
+	}
+	subctx.app.Main.FindCommand(subctx)
+	cmd := subctx.Command()
+	subctx.setupOptions(cmd.Options)
+	cmd.showCompletion(subctx)
 }

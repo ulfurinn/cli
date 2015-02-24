@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"os"
 	"testing"
+
 	. "bitbucket.org/ulfurinn/cli"
 	. "github.com/smartystreets/goconvey/convey"
 )
@@ -108,6 +109,24 @@ func TestApp(t *testing.T) {
 						So(b.String(), ShouldEqual, "a\nb\n")
 					})
 				})
+				Convey("Help completion", func() {
+					app.Main = Command{
+						Commands: []Command{{
+							Name:     "cmd1",
+							Commands: []Command{{Name: "sub1"}},
+						}, {
+							Name: "cmd2",
+						}},
+					}
+					Convey("Top level", func() {
+						app.Run([]string{"help"})
+						So(b.String(), ShouldEqual, "cmd1\ncmd2\n")
+					})
+					Convey("Second level", func() {
+						app.Run([]string{"help", "cmd1"})
+						So(b.String(), ShouldEqual, "sub1\n")
+					})
+				})
 				os.Setenv("_CLI_SHELL_COMPLETION", "false")
 			})
 		})
@@ -136,17 +155,17 @@ func TestApp(t *testing.T) {
 			Convey("Using a subcommand", func() {
 				Convey("Root", func() {
 					app.Run([]string{"help"})
-					So(b.String(), ShouldEqual, "\nUsage: testapp\n\napp usage\n\nSubcommands:\n  cmd1    cmd1 usage\n  cmd2\n\nOptions:\n  --int       default = 0\n  --string    default = \"\"\n")
+					So(b.String(), ShouldEqual, "\nUsage: testapp\n\napp usage\n\nSubcommands:\n  cmd1    cmd1 usage\n  cmd2\n  help\n\nOptions:\n  --int       default = 0\n  --string    default = \"\"\n")
 				})
 				Convey("Subcommand", func() {
-					app.Run([]string{"cmd1", "help"})
+					app.Run([]string{"help", "cmd1"})
 					So(b.String(), ShouldEqual, "\nUsage: testapp cmd1\n\ncmd1 usage\n\nSubcommands:\n  sub1\n\nOptions:\n  --int       default = 0\n  --string    default = \"\"\n")
 				})
 			})
 			Convey("Using an option", func() {
 				Convey("Root", func() {
 					app.Run([]string{"--help"})
-					So(b.String(), ShouldEqual, "\nUsage: testapp\n\napp usage\n\nSubcommands:\n  cmd1    cmd1 usage\n  cmd2\n\nOptions:\n  --int       default = 0\n  --string    default = \"\"\n")
+					So(b.String(), ShouldEqual, "\nUsage: testapp\n\napp usage\n\nSubcommands:\n  cmd1    cmd1 usage\n  cmd2\n  help\n\nOptions:\n  --int       default = 0\n  --string    default = \"\"\n")
 				})
 				Convey("Subcommand", func() {
 					app.Run([]string{"cmd1", "--help"})
