@@ -10,6 +10,17 @@ type Context struct {
 	parseError error
 }
 
+func (c *Context) Arg(i int) string {
+	if i >= len(c.args) {
+		return ""
+	}
+	return c.args[i]
+}
+
+func (c *Context) ArgLen() int {
+	return len(c.args)
+}
+
 func (c *Context) String(name string) (v string) {
 	opt := c.options.Lookup(name)
 	if opt == nil {
