@@ -72,6 +72,9 @@ func (c *Context) setupOptions(cs []Command) {
 		c.options = options.NewOptionSet()
 	}
 	for _, com := range cs {
+		for _, arg := range com.Args {
+			arg.ApplyPositional(c.options)
+		}
 		for _, opt := range com.Options {
 			opt.Apply(c.options)
 		}

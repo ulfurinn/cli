@@ -9,6 +9,7 @@ import (
 type Command struct {
 	Commands   []Command
 	Options    []Option
+	Args       []Option
 	Name       string
 	ShortName  string
 	Usage      string

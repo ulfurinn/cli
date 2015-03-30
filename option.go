@@ -33,6 +33,7 @@ type Option interface {
 	CompletionStrings() []string
 	// Apply Option settings to the given flag set
 	Apply(*options.OptionSet)
+	ApplyPositional(*options.OptionSet)
 	getName() string
 	getUsage() string
 	completion() completionFunc
@@ -228,6 +229,21 @@ func (f BoolOption) Apply(set *options.OptionSet) {
 	})
 }
 
+func (f BoolOption) ApplyPositional(set *options.OptionSet) {
+	if f.EnvVar != "" {
+		if envVal := os.Getenv(f.EnvVar); envVal != "" {
+			envValBool, err := strconv.ParseBool(envVal)
+			if err == nil {
+				f.Value = envValBool
+			}
+		}
+	}
+
+	eachName(f.Name, func(name string) {
+		set.BoolArg(name, f.Value, f.Usage)
+	})
+}
+
 func (f BoolOption) getName() string {
 	return f.Name
 }
@@ -284,6 +300,18 @@ func (f StringOption) Apply(set *options.OptionSet) {
 	})
 }
 
+func (f StringOption) ApplyPositional(set *options.OptionSet) {
+	if f.EnvVar != "" {
+		if envVal := os.Getenv(f.EnvVar); envVal != "" {
+			f.Value = envVal
+		}
+	}
+
+	eachName(f.Name, func(name string) {
+		set.StringArg(name, f.Value, f.Usage)
+	})
+}
+
 func (f StringOption) getName() string {
 	return f.Name
 }
@@ -328,6 +356,21 @@ func (f IntOption) Apply(set *options.OptionSet) {
 
 	eachName(f.Name, func(name string) {
 		set.Int(name, f.Value, f.Usage)
+	})
+}
+
+func (f IntOption) ApplyPositional(set *options.OptionSet) {
+	if f.EnvVar != "" {
+		if envVal := os.Getenv(f.EnvVar); envVal != "" {
+			envValInt, err := strconv.ParseUint(envVal, 10, 64)
+			if err == nil {
+				f.Value = int(envValInt)
+			}
+		}
+	}
+
+	eachName(f.Name, func(name string) {
+		set.IntArg(name, f.Value, f.Usage)
 	})
 }
 
@@ -404,6 +447,21 @@ func (f Float64Option) Apply(set *options.OptionSet) {
 
 	eachName(f.Name, func(name string) {
 		set.Float64(name, f.Value, f.Usage)
+	})
+}
+
+func (f Float64Option) ApplyPositional(set *options.OptionSet) {
+	if f.EnvVar != "" {
+		if envVal := os.Getenv(f.EnvVar); envVal != "" {
+			envValFloat, err := strconv.ParseFloat(envVal, 10)
+			if err == nil {
+				f.Value = float64(envValFloat)
+			}
+		}
+	}
+
+	eachName(f.Name, func(name string) {
+		set.Float64Arg(name, f.Value, f.Usage)
 	})
 }
 
