@@ -67,12 +67,14 @@ func (c *Context) Float64(name string) (v float64) {
 
 func (c *Context) Command() Command { return c.commands[len(c.commands)-1] }
 
-func (c *Context) setupOptions(opts []Option) {
+func (c *Context) setupOptions(cs []Command) {
 	if c.options == nil {
 		c.options = options.NewOptionSet()
 	}
-	for _, opt := range opts {
-		opt.Apply(c.options)
+	for _, com := range cs {
+		for _, opt := range com.Options {
+			opt.Apply(c.options)
+		}
 	}
 	HelpOption.Apply(c.options)
 	if c.app.EnableShellCompletion {

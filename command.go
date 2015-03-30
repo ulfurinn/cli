@@ -46,7 +46,7 @@ func (c *Command) appendHelp() {
 
 // Invokes the command given the context, parses ctx.Args() to generate command-specific flags
 func (c *Command) Run(ctx *Context) (err error) {
-	ctx.setupOptions(c.Options)
+	ctx.setupOptions(ctx.commands)
 	err = ctx.parseOptions()
 	completion := ctx.Bool("generate-shell-completion")
 	help := ctx.Bool("help")
