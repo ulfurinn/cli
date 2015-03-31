@@ -104,6 +104,11 @@ func (c *Context) validateOptions(opts []Option) error {
 
 func (c *Context) findOption(name string) (option Option) {
 	for _, cmd := range c.commands {
+		for _, opt := range cmd.Args {
+			if opt.getName() == name {
+				option = opt
+			}
+		}
 		for _, opt := range cmd.Options {
 			if opt.getName() == name {
 				option = opt
