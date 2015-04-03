@@ -9,11 +9,14 @@ import (
 )
 
 var tplSource = `
-Usage: {{.AppName}}{{.CommandList}}{{if .Usage}}
+Usage: {{.AppName}}{{.CommandList}}{{range .Args}} <{{.Name}}>{{end}}{{if .Usage}}
 
 {{.Usage}}{{end}}{{if .Subcommands}}
 
 Subcommands:{{range .Subcommands}}
+  {{.Name}}{{if .Usage}}    {{.Usage}}{{end}}{{end}}{{end}}{{if .Args}}
+
+Arguments:{{range .Args}}
   {{.Name}}{{if .Usage}}    {{.Usage}}{{end}}{{end}}{{end}}{{if .Options}}
 
 Options:{{range .Options}}
@@ -33,6 +36,7 @@ type helpContext struct {
 		Name  string
 		Usage string
 	}
+	Args    []helpOption
 	Options []helpOption
 }
 
@@ -121,6 +125,9 @@ func (h *helpContext) setup(ctx *Context) {
 		if len(opt.Name) > maxOptLength {
 			maxOptLength = len(opt.Name)
 		}
+	}
+	for _, arg := range activeCommand.Args {
+		h.Args = append(h.Args, helpOption{Name: arg.getName(), Usage: arg.getUsage()})
 	}
 	for k, cmd := range h.Subcommands {
 		cmd.Name = fmt.Sprintf(fmt.Sprintf("%%-%ds", maxSubLength), cmd.Name)
