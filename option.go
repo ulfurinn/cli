@@ -199,12 +199,13 @@ func eachName(longName string, fn func(string)) {
 // func (f IntSliceOption) visible() bool { return !f.Hidden }
 
 type BoolOption struct {
-	Name   string
-	Value  bool
-	Usage  string
-	EnvVar string
-	Hidden bool
-	Var    *bool
+	Name     string
+	Value    bool
+	Usage    string
+	EnvVar   string
+	Hidden   bool
+	Var      *bool
+	Optional bool
 }
 
 func (f BoolOption) HelpString() string {
@@ -212,7 +213,7 @@ func (f BoolOption) HelpString() string {
 }
 
 func (f BoolOption) CompletionStrings() []string {
-	return []string{prefixedNames(f.Name)}
+	return []string{prefixedNames(f.Name), "--no-" + f.Name}
 }
 
 func (f BoolOption) Apply(set *options.OptionSet) {
@@ -226,7 +227,7 @@ func (f BoolOption) Apply(set *options.OptionSet) {
 	}
 
 	eachName(f.Name, func(name string) {
-		set.Bool(name, f.Value, f.Usage, f.Var)
+		set.Bool(name, f.Value, f.Usage, f.Var, f.Optional)
 	})
 }
 
@@ -241,7 +242,7 @@ func (f BoolOption) ApplyPositional(set *options.OptionSet) {
 	}
 
 	eachName(f.Name, func(name string) {
-		set.BoolArg(name, f.Value, f.Usage, f.Var)
+		set.BoolArg(name, f.Value, f.Usage, f.Var, f.Optional)
 	})
 }
 
@@ -269,6 +270,7 @@ type StringOption struct {
 	EnvVar     string
 	Hidden     bool
 	Var        *string
+	Optional   bool
 	Completion completionFunc
 	Validation validationFunc
 }
@@ -298,7 +300,7 @@ func (f StringOption) Apply(set *options.OptionSet) {
 	}
 
 	eachName(f.Name, func(name string) {
-		set.String(name, f.Value, f.Usage, f.Var)
+		set.String(name, f.Value, f.Usage, f.Var, f.Optional)
 	})
 }
 
@@ -310,7 +312,7 @@ func (f StringOption) ApplyPositional(set *options.OptionSet) {
 	}
 
 	eachName(f.Name, func(name string) {
-		set.StringArg(name, f.Value, f.Usage, f.Var)
+		set.StringArg(name, f.Value, f.Usage, f.Var, f.Optional)
 	})
 }
 
@@ -336,6 +338,7 @@ type IntOption struct {
 	Usage      string
 	EnvVar     string
 	Var        *int
+	Optional   bool
 	Completion completionFunc
 }
 
@@ -358,7 +361,7 @@ func (f IntOption) Apply(set *options.OptionSet) {
 	}
 
 	eachName(f.Name, func(name string) {
-		set.Int(name, f.Value, f.Usage, f.Var)
+		set.Int(name, f.Value, f.Usage, f.Var, f.Optional)
 	})
 }
 
@@ -373,7 +376,7 @@ func (f IntOption) ApplyPositional(set *options.OptionSet) {
 	}
 
 	eachName(f.Name, func(name string) {
-		set.IntArg(name, f.Value, f.Usage, f.Var)
+		set.IntArg(name, f.Value, f.Usage, f.Var, f.Optional)
 	})
 }
 
@@ -428,6 +431,7 @@ type Float64Option struct {
 	Usage      string
 	EnvVar     string
 	Var        *float64
+	Optional   bool
 	Completion completionFunc
 }
 
@@ -450,7 +454,7 @@ func (f Float64Option) Apply(set *options.OptionSet) {
 	}
 
 	eachName(f.Name, func(name string) {
-		set.Float64(name, f.Value, f.Usage, f.Var)
+		set.Float64(name, f.Value, f.Usage, f.Var, f.Optional)
 	})
 }
 
@@ -465,7 +469,7 @@ func (f Float64Option) ApplyPositional(set *options.OptionSet) {
 	}
 
 	eachName(f.Name, func(name string) {
-		set.Float64Arg(name, f.Value, f.Usage, f.Var)
+		set.Float64Arg(name, f.Value, f.Usage, f.Var, f.Optional)
 	})
 }
 

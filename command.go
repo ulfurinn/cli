@@ -49,6 +49,8 @@ func (c *Command) appendHelp() {
 func (c *Command) Run(ctx *Context) (err error) {
 	ctx.setupOptions(ctx.commands)
 	err = ctx.parseOptions()
+	// we can't check the result now because with shell completion errors can be a legitimate case
+
 	completion := ctx.Bool("generate-shell-completion")
 	help := ctx.Bool("help")
 
@@ -62,6 +64,11 @@ func (c *Command) Run(ctx *Context) (err error) {
 
 	if help {
 		err = helpOptionAction(ctx)
+		return
+	}
+
+	//	now we can check the result from parseOptions
+	if err != nil {
 		return
 	}
 
