@@ -3,3 +3,5 @@ install:
   - go get -d -t ./...
 script:
   - go test
+sudo: false
+
