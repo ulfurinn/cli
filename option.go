@@ -88,56 +88,106 @@ func eachName(longName string, fn func(string)) {
 
 // func (f GenericOption) visible() bool { return !f.Hidden }
 
-// type StringSlice []string
+type StringSlice []string
 
-// func (f *StringSlice) Set(value string) error {
-// 	*f = append(*f, value)
-// 	return nil
-// }
+func (f *StringSlice) Set(value string) error {
+	*f = append(*f, value)
+	return nil
+}
 
-// func (f *StringSlice) String() string {
-// 	return fmt.Sprintf("%s", *f)
-// }
+func (f *StringSlice) String() string {
+	if f == nil {
+		return ""
+	}
+	return fmt.Sprintf("%s", *f)
+}
 
-// func (f *StringSlice) Value() []string {
-// 	return *f
-// }
+func (f *StringSlice) Value() []string {
+	if f == nil {
+		return []string{}
+	}
+	return *f
+}
 
-// type StringSliceOption struct {
-// 	Name   string
-// 	Value  *StringSlice
-// 	Usage  string
-// 	EnvVar string
-// 	Hidden bool
-// }
+func (f *StringSlice) Explicit() bool { return true }
 
-// func (f StringSliceOption) String() string {
-// 	firstName := strings.Trim(strings.Split(f.Name, ",")[0], " ")
-// 	pref := prefixFor(firstName)
-// 	return withEnvHint(f.EnvVar, fmt.Sprintf("%s '%v'\t%v", prefixedNames(f.Name), pref+firstName+" option "+pref+firstName+" option", f.Usage))
-// }
+type StringSliceOption struct {
+	Name       string
+	Value      *StringSlice
+	Usage      string
+	EnvVar     string
+	Hidden     bool
+	Optional   bool
+	Local      bool
+	Completion completionFunc
+	Validation validationFunc
+}
 
-// func (f StringSliceOption) Apply(set *options.OptionSet) {
-// 	if f.EnvVar != "" {
-// 		if envVal := os.Getenv(f.EnvVar); envVal != "" {
-// 			newVal := &StringSlice{}
-// 			for _, s := range strings.Split(envVal, ",") {
-// 				newVal.Set(s)
-// 			}
-// 			f.Value = newVal
-// 		}
-// 	}
+func (f StringSliceOption) String() string {
+	firstName := strings.Trim(strings.Split(f.Name, ",")[0], " ")
+	pref := prefixFor(firstName)
+	return withEnvHint(f.EnvVar, fmt.Sprintf("%s '%v'\t%v", prefixedNames(f.Name), pref+firstName+" option "+pref+firstName+" option", f.Usage))
+}
 
-// 	eachName(f.Name, func(name string) {
-// 		set.Var(f.Value, name, f.Usage)
-// 	})
-// }
+func (f StringSliceOption) HelpString() string {
+	var fmtString string
+	fmtString = "%s %v\t%v"
 
-// func (f StringSliceOption) getName() string {
-// 	return f.Name
-// }
+	//if len(f.Value) > 0 {
+	//	fmtString = "%s '%v'\t%v"
+	//} else {
+	fmtString = "%s %v\t%v"
+	//}
 
-// func (f StringSliceOption) visible() bool { return !f.Hidden }
+	return withEnvHint(f.EnvVar, fmt.Sprintf(fmtString, prefixedNames(f.Name), f.Value, f.Usage))
+}
+
+func (f StringSliceOption) CompletionStrings() []string {
+	return []string{prefixedNames(f.Name)}
+}
+
+func (f StringSliceOption) Apply(set *options.OptionSet) {
+	f.Value = new(StringSlice)
+	if f.EnvVar != "" {
+		if envVal := os.Getenv(f.EnvVar); envVal != "" {
+			f.Value.Set(envVal)
+		}
+	}
+
+	eachName(f.Name, func(name string) {
+		set.Var(f.Value, name, f.Usage, f.Optional)
+	})
+}
+
+func (f StringSliceOption) ApplyPositional(set *options.OptionSet) {
+	f.Value = new(StringSlice)
+	if f.EnvVar != "" {
+		if envVal := os.Getenv(f.EnvVar); envVal != "" {
+			f.Value.Set(envVal)
+		}
+	}
+
+	eachName(f.Name, func(name string) {
+		set.Argument(f.Value, name, f.Usage, f.Optional)
+	})
+}
+
+func (f StringSliceOption) getName() string {
+	return f.Name
+}
+
+func (f StringSliceOption) getUsage() string {
+	if f.Usage == "" {
+		return fmt.Sprintf("default = %q", f.Value)
+	} else {
+		return fmt.Sprintf("%s; default = %q", f.Usage, f.Value)
+	}
+}
+
+func (f StringSliceOption) visible() bool              { return !f.Hidden }
+func (f StringSliceOption) local() bool                { return f.Local }
+func (f StringSliceOption) completion() completionFunc { return f.Completion }
+func (f StringSliceOption) validation() validationFunc { return f.Validation }
 
 // type IntSlice []int
 

@@ -39,6 +39,23 @@ func TestApp(t *testing.T) {
 			app.Run([]string{"testcmd", "sub"})
 			So(run, ShouldBeTrue)
 		})
+		Convey("Option types", func() {
+			Convey("String slice", func() {
+				var o []string
+				app.Main.Name = "_main"
+				app.Main.Options = []Option{
+					StringSliceOption{Name: "o"},
+				}
+				app.Main.Action = func(ctx *Context) error {
+					o = ctx.StringSlice("o")
+					return nil
+				}
+				err := app.Run([]string{"--o", "1", "--o", "2", "--o", "3"})
+				So(err, ShouldBeNil)
+				So(o, ShouldResemble, []string{"1", "2", "3"})
+			})
+
+		})
 		Convey("Given flags", func() {
 			app.Main = Command{
 				Commands: []Command{{

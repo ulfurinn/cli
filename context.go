@@ -65,6 +65,17 @@ func (c *Context) Float64(name string) (v float64) {
 	return
 }
 
+func (c *Context) StringSlice(name string) (v []string) {
+	opt := c.options.Lookup(name)
+	if opt == nil {
+		return
+	}
+	if sliceOpt, ok := opt.Value.(*StringSlice); ok && sliceOpt != nil {
+		v = *sliceOpt
+	}
+	return
+}
+
 func (c *Context) Command() *Command { return &c.commands[len(c.commands)-1] }
 
 func (c *Context) setupOptions(cs []Command) {
