@@ -65,18 +65,24 @@ func (c *Context) Float64(name string) (v float64) {
 	return
 }
 
-func (c *Context) Command() Command { return c.commands[len(c.commands)-1] }
+func (c *Context) Command() *Command { return &c.commands[len(c.commands)-1] }
 
 func (c *Context) setupOptions(cs []Command) {
 	if c.options == nil {
 		c.options = options.NewOptionSet()
 	}
-	for _, com := range cs {
+	for i, com := range cs {
 		for _, arg := range com.Args {
-			arg.ApplyPositional(c.options)
+			//	only the direct command may take a positional
+			if i == len(cs)-1 {
+				arg.ApplyPositional(c.options)
+			}
 		}
 		for _, opt := range com.Options {
-			opt.Apply(c.options)
+			//	local options are not inherited by subcommands
+			if i == len(cs)-1 || !opt.local() {
+				opt.Apply(c.options)
+			}
 		}
 	}
 	HelpOption.Apply(c.options)

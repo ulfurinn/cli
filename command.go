@@ -22,6 +22,16 @@ func (c *Command) HasName(name string) bool {
 	return c.Name == name || c.ShortName == name
 }
 
+func (c *Command) FindCommandByName(name string) (cmd *Command) {
+	for i := range c.Commands {
+		if c.Commands[i].HasName(name) {
+			cmd = &c.Commands[i]
+			break
+		}
+	}
+	return
+}
+
 func (c *Command) FindCommand(ctx *Context) {
 	ctx.commands = append(ctx.commands, *c)
 	if len(ctx.args) == 0 {

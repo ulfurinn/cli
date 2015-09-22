@@ -28,6 +28,5 @@ func (a *App) Run(arguments []string) error {
 		args: arguments,
 	}
 	a.Main.FindCommand(ctx)
-	cmd := ctx.Command()
-	return cmd.Run(ctx)
+	return ctx.Command().Run(ctx)
 }

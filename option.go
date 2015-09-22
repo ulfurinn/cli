@@ -34,6 +34,7 @@ type Option interface {
 	// Apply Option settings to the given flag set
 	Apply(*options.OptionSet)
 	ApplyPositional(*options.OptionSet)
+	local() bool
 	getName() string
 	getUsage() string
 	completion() completionFunc
@@ -206,6 +207,7 @@ type BoolOption struct {
 	Hidden   bool
 	Var      *bool
 	Optional bool
+	Local    bool
 }
 
 func (f BoolOption) HelpString() string {
@@ -259,6 +261,7 @@ func (f BoolOption) getUsage() string {
 }
 
 func (f BoolOption) visible() bool              { return !f.Hidden }
+func (f BoolOption) local() bool                { return f.Local }
 func (f BoolOption) completion() completionFunc { return nil }
 func (f BoolOption) validation() validationFunc { return nil }
 
@@ -271,6 +274,7 @@ type StringOption struct {
 	Hidden     bool
 	Var        *string
 	Optional   bool
+	Local      bool
 	Completion completionFunc
 	Validation validationFunc
 }
@@ -329,6 +333,7 @@ func (f StringOption) getUsage() string {
 }
 
 func (f StringOption) visible() bool              { return !f.Hidden }
+func (f StringOption) local() bool                { return f.Local }
 func (f StringOption) completion() completionFunc { return f.Completion }
 func (f StringOption) validation() validationFunc { return f.Validation }
 
@@ -339,6 +344,7 @@ type IntOption struct {
 	EnvVar     string
 	Var        *int
 	Optional   bool
+	Local      bool
 	Completion completionFunc
 }
 
@@ -392,6 +398,7 @@ func (f IntOption) getUsage() string {
 	}
 }
 
+func (f IntOption) local() bool                { return f.Local }
 func (f IntOption) completion() completionFunc { return f.Completion }
 func (f IntOption) validation() validationFunc { return nil }
 
@@ -432,6 +439,7 @@ type Float64Option struct {
 	EnvVar     string
 	Var        *float64
 	Optional   bool
+	Local      bool
 	Completion completionFunc
 }
 
@@ -485,6 +493,7 @@ func (f Float64Option) getUsage() string {
 	}
 }
 
+func (f Float64Option) local() bool                { return f.Local }
 func (f Float64Option) completion() completionFunc { return f.Completion }
 func (f Float64Option) validation() validationFunc { return nil }
 
