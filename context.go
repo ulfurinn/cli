@@ -1,12 +1,12 @@
 package cli
 
-import "bitbucket.org/ulfurinn/options"
+import "bitbucket.org/ulfurinn/cli/flags"
 
 type Context struct {
 	app        *App
 	args       []string
 	commands   []Command
-	options    *options.OptionSet
+	options    *flags.OptionSet
 	parseError error
 }
 
@@ -26,7 +26,7 @@ func (c *Context) String(name string) (v string) {
 	if opt == nil {
 		return
 	}
-	if strOpt, ok := opt.Value.(*options.StringValue); ok && strOpt != nil {
+	if strOpt, ok := opt.Value.(*flags.StringValue); ok && strOpt != nil {
 		v = string(*strOpt)
 	}
 	return
@@ -37,7 +37,7 @@ func (c *Context) Bool(name string) (v bool) {
 	if opt == nil {
 		return
 	}
-	if boolOpt, ok := opt.Value.(*options.BoolValue); ok && boolOpt != nil {
+	if boolOpt, ok := opt.Value.(*flags.BoolValue); ok && boolOpt != nil {
 		v = bool(*boolOpt)
 	}
 	return
@@ -48,7 +48,7 @@ func (c *Context) Int(name string) (v int) {
 	if opt == nil {
 		return
 	}
-	if intOpt, ok := opt.Value.(*options.IntValue); ok && intOpt != nil {
+	if intOpt, ok := opt.Value.(*flags.IntValue); ok && intOpt != nil {
 		v = int(*intOpt)
 	}
 	return
@@ -59,7 +59,7 @@ func (c *Context) Float64(name string) (v float64) {
 	if opt == nil {
 		return
 	}
-	if floatOpt, ok := opt.Value.(*options.Float64Value); ok && floatOpt != nil {
+	if floatOpt, ok := opt.Value.(*flags.Float64Value); ok && floatOpt != nil {
 		v = float64(*floatOpt)
 	}
 	return
@@ -80,7 +80,7 @@ func (c *Context) Command() *Command { return &c.commands[len(c.commands)-1] }
 
 func (c *Context) setupOptions(cs []Command) {
 	if c.options == nil {
-		c.options = options.NewOptionSet()
+		c.options = flags.NewOptionSet()
 	}
 	for i, com := range cs {
 		for _, arg := range com.Args {

@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"bitbucket.org/ulfurinn/options"
+	"bitbucket.org/ulfurinn/cli/flags"
 )
 
 // This flag enables bash-completion for all commands and subcommands
@@ -32,8 +32,8 @@ type Option interface {
 	HelpString() string
 	CompletionStrings() []string
 	// Apply Option settings to the given flag set
-	Apply(*options.OptionSet)
-	ApplyPositional(*options.OptionSet)
+	Apply(*flags.OptionSet)
+	ApplyPositional(*flags.OptionSet)
 	local() bool
 	getName() string
 	getUsage() string
@@ -146,7 +146,7 @@ func (f StringSliceOption) CompletionStrings() []string {
 	return []string{prefixedNames(f.Name)}
 }
 
-func (f StringSliceOption) Apply(set *options.OptionSet) {
+func (f StringSliceOption) Apply(set *flags.OptionSet) {
 	f.Value = new(StringSlice)
 	if f.EnvVar != "" {
 		if envVal := os.Getenv(f.EnvVar); envVal != "" {
@@ -159,7 +159,7 @@ func (f StringSliceOption) Apply(set *options.OptionSet) {
 	})
 }
 
-func (f StringSliceOption) ApplyPositional(set *options.OptionSet) {
+func (f StringSliceOption) ApplyPositional(set *flags.OptionSet) {
 	f.Value = new(StringSlice)
 	if f.EnvVar != "" {
 		if envVal := os.Getenv(f.EnvVar); envVal != "" {
@@ -268,7 +268,7 @@ func (f BoolOption) CompletionStrings() []string {
 	return []string{prefixedNames(f.Name), "--no-" + f.Name}
 }
 
-func (f BoolOption) Apply(set *options.OptionSet) {
+func (f BoolOption) Apply(set *flags.OptionSet) {
 	if f.EnvVar != "" {
 		if envVal := os.Getenv(f.EnvVar); envVal != "" {
 			envValBool, err := strconv.ParseBool(envVal)
@@ -283,7 +283,7 @@ func (f BoolOption) Apply(set *options.OptionSet) {
 	})
 }
 
-func (f BoolOption) ApplyPositional(set *options.OptionSet) {
+func (f BoolOption) ApplyPositional(set *flags.OptionSet) {
 	if f.EnvVar != "" {
 		if envVal := os.Getenv(f.EnvVar); envVal != "" {
 			envValBool, err := strconv.ParseBool(envVal)
@@ -346,7 +346,7 @@ func (f StringOption) CompletionStrings() []string {
 	return []string{prefixedNames(f.Name)}
 }
 
-func (f StringOption) Apply(set *options.OptionSet) {
+func (f StringOption) Apply(set *flags.OptionSet) {
 	if f.EnvVar != "" {
 		if envVal := os.Getenv(f.EnvVar); envVal != "" {
 			f.Value = envVal
@@ -358,7 +358,7 @@ func (f StringOption) Apply(set *options.OptionSet) {
 	})
 }
 
-func (f StringOption) ApplyPositional(set *options.OptionSet) {
+func (f StringOption) ApplyPositional(set *flags.OptionSet) {
 	if f.EnvVar != "" {
 		if envVal := os.Getenv(f.EnvVar); envVal != "" {
 			f.Value = envVal
@@ -406,7 +406,7 @@ func (f IntOption) CompletionStrings() []string {
 	return []string{prefixedNames(f.Name)}
 }
 
-func (f IntOption) Apply(set *options.OptionSet) {
+func (f IntOption) Apply(set *flags.OptionSet) {
 	if f.EnvVar != "" {
 		if envVal := os.Getenv(f.EnvVar); envVal != "" {
 			envValInt, err := strconv.ParseUint(envVal, 10, 64)
@@ -421,7 +421,7 @@ func (f IntOption) Apply(set *options.OptionSet) {
 	})
 }
 
-func (f IntOption) ApplyPositional(set *options.OptionSet) {
+func (f IntOption) ApplyPositional(set *flags.OptionSet) {
 	if f.EnvVar != "" {
 		if envVal := os.Getenv(f.EnvVar); envVal != "" {
 			envValInt, err := strconv.ParseUint(envVal, 10, 64)
@@ -501,7 +501,7 @@ func (f Float64Option) CompletionStrings() []string {
 	return []string{prefixedNames(f.Name)}
 }
 
-func (f Float64Option) Apply(set *options.OptionSet) {
+func (f Float64Option) Apply(set *flags.OptionSet) {
 	if f.EnvVar != "" {
 		if envVal := os.Getenv(f.EnvVar); envVal != "" {
 			envValFloat, err := strconv.ParseFloat(envVal, 10)
@@ -516,7 +516,7 @@ func (f Float64Option) Apply(set *options.OptionSet) {
 	})
 }
 
-func (f Float64Option) ApplyPositional(set *options.OptionSet) {
+func (f Float64Option) ApplyPositional(set *flags.OptionSet) {
 	if f.EnvVar != "" {
 		if envVal := os.Getenv(f.EnvVar); envVal != "" {
 			envValFloat, err := strconv.ParseFloat(envVal, 10)
