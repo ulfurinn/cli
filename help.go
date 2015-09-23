@@ -146,6 +146,6 @@ func helpCompletion(ctx *Context) {
 	}
 	subctx.app.Main.FindCommand(subctx)
 	cmd := subctx.Command()
-	subctx.setupOptions(subctx.commands)
+	subctx.setupOptions()
 	cmd.showCompletion(subctx)
 }

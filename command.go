@@ -55,54 +55,6 @@ func (c *Command) appendHelp() {
 	c.Commands = append(c.Commands, HelpCommand)
 }
 
-// Invokes the command given the context, parses ctx.Args() to generate command-specific flags
-func (c *Command) Run(ctx *Context) (err error) {
-	ctx.setupOptions(ctx.commands)
-	err = ctx.parseOptions()
-	// we can't check the result now because with shell completion errors can be a legitimate case
-
-	completion := ctx.Bool("generate-shell-completion")
-	help := ctx.Bool("help")
-
-	if completion {
-		if err == nil || ctx.options.MissingValue != nil {
-			c.showCompletion(ctx)
-			err = nil
-		}
-		return
-	}
-
-	if help {
-		err = helpOptionAction(ctx)
-		return
-	}
-
-	//	now we can check the result from parseOptions
-	if err != nil {
-		return
-	}
-
-	err = ctx.validateOptions(c.Options)
-	if err != nil {
-		return err
-	}
-
-	for _, cmd := range ctx.commands {
-		if cmd.Before != nil {
-			if err := cmd.Before(ctx); err != nil {
-				return err
-			}
-		}
-	}
-
-	if err == nil && c.Action != nil {
-		err = c.Action(ctx)
-	}
-
-	return
-
-}
-
 func (c *Command) showCompletion(ctx *Context) {
 	if c.Completion != nil {
 		c.Completion(ctx)

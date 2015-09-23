@@ -78,20 +78,67 @@ func (c *Context) StringSlice(name string) (v []string) {
 
 func (c *Context) Command() *Command { return &c.commands[len(c.commands)-1] }
 
-func (c *Context) setupOptions(cs []Command) {
+func (c *Context) run() (err error) {
+	c.setupOptions()
+	err = c.parseOptions()
+	// we can't check the result now because with shell completion errors can be a legitimate case
+
+	completion := c.Bool("generate-shell-completion")
+	help := c.Bool("help")
+
+	if completion {
+		if err == nil || c.options.MissingValue != nil {
+			c.Command().showCompletion(c)
+			err = nil
+		}
+		return
+	}
+
+	if help {
+		err = helpOptionAction(c)
+		return
+	}
+
+	//	now we can check the result from parseOptions
+	if err != nil {
+		return
+	}
+
+	err = c.validateOptions()
+	if err != nil {
+		return err
+	}
+
+	for _, cmd := range c.commands {
+		if cmd.Before != nil {
+			if err := cmd.Before(c); err != nil {
+				return err
+			}
+		}
+	}
+
+	if err == nil && c.Command().Action != nil {
+		err = c.Command().Action(c)
+	}
+
+	return
+
+}
+
+func (c *Context) setupOptions() {
 	if c.options == nil {
 		c.options = flags.NewOptionSet()
 	}
-	for i, com := range cs {
+	for i, com := range c.commands {
 		for _, arg := range com.Args {
 			//	only the direct command may take a positional
-			if i == len(cs)-1 {
+			if i == len(c.commands)-1 {
 				arg.ApplyPositional(c.options)
 			}
 		}
 		for _, opt := range com.Options {
 			//	local options are not inherited by subcommands
-			if i == len(cs)-1 || !opt.local() {
+			if i == len(c.commands)-1 || !opt.local() {
 				opt.Apply(c.options)
 			}
 		}
@@ -108,8 +155,8 @@ func (c *Context) parseOptions() (err error) {
 	return
 }
 
-func (c *Context) validateOptions(opts []Option) error {
-	for _, opt := range opts {
+func (c *Context) validateOptions() error {
+	for _, opt := range c.Command().Options {
 		if opt.validation() != nil {
 			if err := opt.validation()(c, opt); err != nil {
 				return nil
