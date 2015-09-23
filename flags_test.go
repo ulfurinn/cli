@@ -9,7 +9,7 @@ import . "github.com/smartystreets/goconvey/convey"
 
 func TestOptionSet(t *testing.T) {
 	Convey("Given an option set", t, func() {
-		set := NewOptionSet()
+		set := NewSet()
 		set.Out = ioutil.Discard
 
 		Convey("Declaring flags", func() {

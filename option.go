@@ -32,11 +32,11 @@ type Option interface {
 	HelpString() string
 	CompletionStrings() []string
 	// Apply Option settings to the given flag set
-	Apply(*flags.OptionSet)
-	ApplyPositional(*flags.OptionSet)
+	ApplyNamed(*flags.Set)
+	ApplyPositional(*flags.Set)
 	local() bool
-	getName() string
-	getUsage() string
+	name() string
+	usage() string
 	completion() completionFunc
 	validation() validationFunc
 	//visible() bool
@@ -146,7 +146,7 @@ func (f StringSliceOption) CompletionStrings() []string {
 	return []string{prefixedNames(f.Name)}
 }
 
-func (f StringSliceOption) Apply(set *flags.OptionSet) {
+func (f StringSliceOption) ApplyNamed(set *flags.Set) {
 	f.Value = new(StringSlice)
 	if f.EnvVar != "" {
 		if envVal := os.Getenv(f.EnvVar); envVal != "" {
@@ -159,7 +159,7 @@ func (f StringSliceOption) Apply(set *flags.OptionSet) {
 	})
 }
 
-func (f StringSliceOption) ApplyPositional(set *flags.OptionSet) {
+func (f StringSliceOption) ApplyPositional(set *flags.Set) {
 	f.Value = new(StringSlice)
 	if f.EnvVar != "" {
 		if envVal := os.Getenv(f.EnvVar); envVal != "" {
@@ -172,11 +172,11 @@ func (f StringSliceOption) ApplyPositional(set *flags.OptionSet) {
 	})
 }
 
-func (f StringSliceOption) getName() string {
+func (f StringSliceOption) name() string {
 	return f.Name
 }
 
-func (f StringSliceOption) getUsage() string {
+func (f StringSliceOption) usage() string {
 	if f.Usage == "" {
 		return fmt.Sprintf("default = %q", f.Value)
 	} else {
@@ -268,7 +268,7 @@ func (f BoolOption) CompletionStrings() []string {
 	return []string{prefixedNames(f.Name), "--no-" + f.Name}
 }
 
-func (f BoolOption) Apply(set *flags.OptionSet) {
+func (f BoolOption) ApplyNamed(set *flags.Set) {
 	if f.EnvVar != "" {
 		if envVal := os.Getenv(f.EnvVar); envVal != "" {
 			envValBool, err := strconv.ParseBool(envVal)
@@ -283,7 +283,7 @@ func (f BoolOption) Apply(set *flags.OptionSet) {
 	})
 }
 
-func (f BoolOption) ApplyPositional(set *flags.OptionSet) {
+func (f BoolOption) ApplyPositional(set *flags.Set) {
 	if f.EnvVar != "" {
 		if envVal := os.Getenv(f.EnvVar); envVal != "" {
 			envValBool, err := strconv.ParseBool(envVal)
@@ -298,11 +298,11 @@ func (f BoolOption) ApplyPositional(set *flags.OptionSet) {
 	})
 }
 
-func (f BoolOption) getName() string {
+func (f BoolOption) name() string {
 	return f.Name
 }
 
-func (f BoolOption) getUsage() string {
+func (f BoolOption) usage() string {
 	if f.Usage == "" {
 		return fmt.Sprintf("default = %v", f.Value)
 	} else {
@@ -346,7 +346,7 @@ func (f StringOption) CompletionStrings() []string {
 	return []string{prefixedNames(f.Name)}
 }
 
-func (f StringOption) Apply(set *flags.OptionSet) {
+func (f StringOption) ApplyNamed(set *flags.Set) {
 	if f.EnvVar != "" {
 		if envVal := os.Getenv(f.EnvVar); envVal != "" {
 			f.Value = envVal
@@ -358,7 +358,7 @@ func (f StringOption) Apply(set *flags.OptionSet) {
 	})
 }
 
-func (f StringOption) ApplyPositional(set *flags.OptionSet) {
+func (f StringOption) ApplyPositional(set *flags.Set) {
 	if f.EnvVar != "" {
 		if envVal := os.Getenv(f.EnvVar); envVal != "" {
 			f.Value = envVal
@@ -370,11 +370,11 @@ func (f StringOption) ApplyPositional(set *flags.OptionSet) {
 	})
 }
 
-func (f StringOption) getName() string {
+func (f StringOption) name() string {
 	return f.Name
 }
 
-func (f StringOption) getUsage() string {
+func (f StringOption) usage() string {
 	if f.Usage == "" {
 		return fmt.Sprintf("default = %q", f.Value)
 	} else {
@@ -406,7 +406,7 @@ func (f IntOption) CompletionStrings() []string {
 	return []string{prefixedNames(f.Name)}
 }
 
-func (f IntOption) Apply(set *flags.OptionSet) {
+func (f IntOption) ApplyNamed(set *flags.Set) {
 	if f.EnvVar != "" {
 		if envVal := os.Getenv(f.EnvVar); envVal != "" {
 			envValInt, err := strconv.ParseUint(envVal, 10, 64)
@@ -421,7 +421,7 @@ func (f IntOption) Apply(set *flags.OptionSet) {
 	})
 }
 
-func (f IntOption) ApplyPositional(set *flags.OptionSet) {
+func (f IntOption) ApplyPositional(set *flags.Set) {
 	if f.EnvVar != "" {
 		if envVal := os.Getenv(f.EnvVar); envVal != "" {
 			envValInt, err := strconv.ParseUint(envVal, 10, 64)
@@ -436,11 +436,11 @@ func (f IntOption) ApplyPositional(set *flags.OptionSet) {
 	})
 }
 
-func (f IntOption) getName() string {
+func (f IntOption) name() string {
 	return f.Name
 }
 
-func (f IntOption) getUsage() string {
+func (f IntOption) usage() string {
 	if f.Usage == "" {
 		return fmt.Sprintf("default = %v", f.Value)
 	} else {
@@ -501,7 +501,7 @@ func (f Float64Option) CompletionStrings() []string {
 	return []string{prefixedNames(f.Name)}
 }
 
-func (f Float64Option) Apply(set *flags.OptionSet) {
+func (f Float64Option) ApplyNamed(set *flags.Set) {
 	if f.EnvVar != "" {
 		if envVal := os.Getenv(f.EnvVar); envVal != "" {
 			envValFloat, err := strconv.ParseFloat(envVal, 10)
@@ -516,7 +516,7 @@ func (f Float64Option) Apply(set *flags.OptionSet) {
 	})
 }
 
-func (f Float64Option) ApplyPositional(set *flags.OptionSet) {
+func (f Float64Option) ApplyPositional(set *flags.Set) {
 	if f.EnvVar != "" {
 		if envVal := os.Getenv(f.EnvVar); envVal != "" {
 			envValFloat, err := strconv.ParseFloat(envVal, 10)
@@ -531,11 +531,11 @@ func (f Float64Option) ApplyPositional(set *flags.OptionSet) {
 	})
 }
 
-func (f Float64Option) getName() string {
+func (f Float64Option) name() string {
 	return f.Name
 }
 
-func (f Float64Option) getUsage() string {
+func (f Float64Option) usage() string {
 	if f.Usage == "" {
 		return fmt.Sprintf("default = %v", f.Value)
 	} else {

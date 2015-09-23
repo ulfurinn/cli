@@ -22,7 +22,7 @@ type Option struct {
 	Default  string
 }
 
-type OptionSet struct {
+type Set struct {
 	arguments        []*Option
 	declared, actual map[string]*Option
 	args             []string
@@ -30,13 +30,13 @@ type OptionSet struct {
 	Out              io.Writer
 }
 
-func NewOptionSet() *OptionSet {
-	return &OptionSet{
+func NewSet() *Set {
+	return &Set{
 		Out: os.Stderr,
 	}
 }
 
-func (s *OptionSet) Argument(v Value, name, usage string, optional bool) {
+func (s *Set) Argument(v Value, name, usage string, optional bool) {
 	opt := &Option{Name: name, Usage: usage, Value: v, Default: v.String(), Optional: optional}
 	_, declared := s.declared[name]
 	if declared {
@@ -51,7 +51,7 @@ func (s *OptionSet) Argument(v Value, name, usage string, optional bool) {
 	s.arguments = append(s.arguments, opt)
 }
 
-func (s *OptionSet) Var(v Value, name, usage string, optional bool) {
+func (s *Set) Var(v Value, name, usage string, optional bool) {
 	opt := &Option{Name: name, Usage: usage, Value: v, Default: v.String(), Optional: optional}
 	_, declared := s.declared[name]
 	if declared {
@@ -92,7 +92,7 @@ func isOption(s string) (option bool, name string) {
 	return
 }
 
-func (s *OptionSet) Parse(args []string) (err error) {
+func (s *Set) Parse(args []string) (err error) {
 	var next string
 	s.args = args
 	if s.actual == nil {
@@ -190,18 +190,18 @@ func (s *OptionSet) Parse(args []string) (err error) {
 	return
 }
 
-func (s *OptionSet) Lookup(name string) *Option {
+func (s *Set) Lookup(name string) *Option {
 	return s.declared[name]
 }
 
-func (s *OptionSet) Arg(n int) string {
+func (s *Set) Arg(n int) string {
 	if n < len(s.args) {
 		return s.args[n]
 	}
 	return ""
 }
 
-func (s *OptionSet) String(name string, value string, usage string, t *string, optional bool) *string {
+func (s *Set) String(name string, value string, usage string, t *string, optional bool) *string {
 	if t == nil {
 		t = new(string)
 	}
@@ -209,7 +209,7 @@ func (s *OptionSet) String(name string, value string, usage string, t *string, o
 	return t
 }
 
-func (s *OptionSet) StringArg(name string, value string, usage string, t *string, optional bool) *string {
+func (s *Set) StringArg(name string, value string, usage string, t *string, optional bool) *string {
 	if t == nil {
 		t = new(string)
 	}
@@ -217,7 +217,7 @@ func (s *OptionSet) StringArg(name string, value string, usage string, t *string
 	return t
 }
 
-func (s *OptionSet) StringVar(target *string, name string, value string, usage string, positional bool, optional bool) {
+func (s *Set) StringVar(target *string, name string, value string, usage string, positional bool, optional bool) {
 	if positional {
 		s.Argument(newStringValue(target, value), name, usage, optional)
 	} else {
@@ -225,7 +225,7 @@ func (s *OptionSet) StringVar(target *string, name string, value string, usage s
 	}
 }
 
-func (s *OptionSet) Int(name string, value int, usage string, t *int, optional bool) *int {
+func (s *Set) Int(name string, value int, usage string, t *int, optional bool) *int {
 	if t == nil {
 		t = new(int)
 	}
@@ -233,7 +233,7 @@ func (s *OptionSet) Int(name string, value int, usage string, t *int, optional b
 	return t
 }
 
-func (s *OptionSet) IntArg(name string, value int, usage string, t *int, optional bool) *int {
+func (s *Set) IntArg(name string, value int, usage string, t *int, optional bool) *int {
 	if t == nil {
 		t = new(int)
 	}
@@ -241,7 +241,7 @@ func (s *OptionSet) IntArg(name string, value int, usage string, t *int, optiona
 	return t
 }
 
-func (s *OptionSet) IntVar(target *int, name string, value int, usage string, positional bool, optional bool) {
+func (s *Set) IntVar(target *int, name string, value int, usage string, positional bool, optional bool) {
 	if positional {
 		s.Argument(newIntValue(target, value), name, usage, optional)
 	} else {
@@ -249,7 +249,7 @@ func (s *OptionSet) IntVar(target *int, name string, value int, usage string, po
 	}
 }
 
-func (s *OptionSet) Float64(name string, value float64, usage string, t *float64, optional bool) *float64 {
+func (s *Set) Float64(name string, value float64, usage string, t *float64, optional bool) *float64 {
 	if t == nil {
 		t = new(float64)
 	}
@@ -257,7 +257,7 @@ func (s *OptionSet) Float64(name string, value float64, usage string, t *float64
 	return t
 }
 
-func (s *OptionSet) Float64Arg(name string, value float64, usage string, t *float64, optional bool) *float64 {
+func (s *Set) Float64Arg(name string, value float64, usage string, t *float64, optional bool) *float64 {
 	if t == nil {
 		t = new(float64)
 	}
@@ -265,7 +265,7 @@ func (s *OptionSet) Float64Arg(name string, value float64, usage string, t *floa
 	return t
 }
 
-func (s *OptionSet) Float64Var(target *float64, name string, value float64, usage string, positional bool, optional bool) {
+func (s *Set) Float64Var(target *float64, name string, value float64, usage string, positional bool, optional bool) {
 	if positional {
 		s.Argument(newFloat64Value(target, value), name, usage, optional)
 	} else {
@@ -273,7 +273,7 @@ func (s *OptionSet) Float64Var(target *float64, name string, value float64, usag
 	}
 }
 
-func (s *OptionSet) Bool(name string, value bool, usage string, t *bool, optional bool) *bool {
+func (s *Set) Bool(name string, value bool, usage string, t *bool, optional bool) *bool {
 	if t == nil {
 		t = new(bool)
 	}
@@ -281,7 +281,7 @@ func (s *OptionSet) Bool(name string, value bool, usage string, t *bool, optiona
 	return t
 }
 
-func (s *OptionSet) BoolArg(name string, value bool, usage string, t *bool, optional bool) *bool {
+func (s *Set) BoolArg(name string, value bool, usage string, t *bool, optional bool) *bool {
 	if t == nil {
 		t = new(bool)
 	}
@@ -289,7 +289,7 @@ func (s *OptionSet) BoolArg(name string, value bool, usage string, t *bool, opti
 	return t
 }
 
-func (s *OptionSet) BoolVar(target *bool, name string, value bool, usage string, positional bool, optional bool) {
+func (s *Set) BoolVar(target *bool, name string, value bool, usage string, positional bool, optional bool) {
 	if positional {
 		s.Argument(newBoolValue(target, value), name, usage, optional)
 	} else {
@@ -297,7 +297,7 @@ func (s *OptionSet) BoolVar(target *bool, name string, value bool, usage string,
 	}
 }
 
-func (s *OptionSet) out() io.Writer {
+func (s *Set) out() io.Writer {
 	return s.Out
 }
 

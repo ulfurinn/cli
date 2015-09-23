@@ -6,7 +6,7 @@ type Context struct {
 	app        *App
 	args       []string
 	commands   []Command
-	options    *flags.OptionSet
+	options    *flags.Set
 	parseError error
 }
 
@@ -127,7 +127,7 @@ func (c *Context) run() (err error) {
 
 func (c *Context) setupOptions() {
 	if c.options == nil {
-		c.options = flags.NewOptionSet()
+		c.options = flags.NewSet()
 	}
 	for i, com := range c.commands {
 		for _, arg := range com.Args {
@@ -139,13 +139,13 @@ func (c *Context) setupOptions() {
 		for _, opt := range com.Options {
 			//	local options are not inherited by subcommands
 			if i == len(c.commands)-1 || !opt.local() {
-				opt.Apply(c.options)
+				opt.ApplyNamed(c.options)
 			}
 		}
 	}
-	HelpOption.Apply(c.options)
+	HelpOption.ApplyNamed(c.options)
 	if c.app.EnableShellCompletion {
-		ShellCompletionOption.Apply(c.options)
+		ShellCompletionOption.ApplyNamed(c.options)
 	}
 }
 
@@ -169,12 +169,12 @@ func (c *Context) validateOptions() error {
 func (c *Context) findOption(name string) (option Option) {
 	for _, cmd := range c.commands {
 		for _, opt := range cmd.Args {
-			if opt.getName() == name {
+			if opt.name() == name {
 				option = opt
 			}
 		}
 		for _, opt := range cmd.Options {
-			if opt.getName() == name {
+			if opt.name() == name {
 				option = opt
 			}
 		}

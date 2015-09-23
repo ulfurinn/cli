@@ -109,7 +109,7 @@ func ValueListCompletion(ctx *Context, opt Option) []string {
 
 func ValueListValidation(ctx *Context, opt Option) error {
 	// default values always pass
-	if lowOpt := ctx.options.Lookup(opt.getName()); lowOpt != nil && !lowOpt.Value.Explicit() {
+	if lowOpt := ctx.options.Lookup(opt.name()); lowOpt != nil && !lowOpt.Value.Explicit() {
 		return nil
 	}
 	switch o := opt.(type) {

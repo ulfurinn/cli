@@ -111,7 +111,7 @@ func (h *helpContext) setup(ctx *Context) {
 	opts := map[string]helpOption{}
 	for _, cmd := range usedCommands {
 		for _, opt := range cmd.Options {
-			opts[opt.getName()] = helpOption{"--" + opt.getName(), opt.getUsage()}
+			opts[opt.name()] = helpOption{"--" + opt.name(), opt.usage()}
 		}
 	}
 	optKeys := []string{}
@@ -127,7 +127,7 @@ func (h *helpContext) setup(ctx *Context) {
 		}
 	}
 	for _, arg := range activeCommand.Args {
-		h.Args = append(h.Args, helpOption{Name: arg.getName(), Usage: arg.getUsage()})
+		h.Args = append(h.Args, helpOption{Name: arg.name(), Usage: arg.usage()})
 	}
 	for k, cmd := range h.Subcommands {
 		cmd.Name = fmt.Sprintf(fmt.Sprintf("%%-%ds", maxSubLength), cmd.Name)
