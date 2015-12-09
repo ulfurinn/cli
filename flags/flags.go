@@ -131,7 +131,7 @@ func (s *Set) Parse(args []string) (err error) {
 				if len(s.args) > 0 {
 					switch opt.Value.(type) {
 					case *BoolValue:
-						if s.args[0] == "true" || s.args[1] == "false" {
+						if s.args[0] == "true" || s.args[0] == "false" {
 							value, s.args = s.args[0], s.args[1:]
 						} else {
 							if inverted {
