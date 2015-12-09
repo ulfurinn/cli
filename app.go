@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"fmt"
 	"io"
 	"os"
 )
@@ -29,4 +30,16 @@ func (a *App) Run(arguments []string) error {
 	}
 	a.Main.FindCommand(ctx)
 	return ctx.run()
+}
+
+func (a *App) RunMain() {
+	if err := a.Run(os.Args[1:]); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		if exit, ok := err.(Exit); ok {
+			os.Exit(exit.StatusCode)
+		} else {
+			os.Exit(1)
+		}
+	}
+	os.Exit(0)
 }
