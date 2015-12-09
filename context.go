@@ -17,6 +17,12 @@ func (c *Context) Arg(i int) string {
 	return c.args[i]
 }
 
+func (c *Context) Args() []string {
+	cp := make([]string, len(c.args))
+	copy(cp, c.args)
+	return cp
+}
+
 func (c *Context) ArgLen() int {
 	return len(c.args)
 }
