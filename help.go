@@ -109,9 +109,11 @@ func (h *helpContext) setup(ctx *Context) {
 		}
 	}
 	opts := map[string]helpOption{}
-	for _, cmd := range usedCommands {
+	for i, cmd := range usedCommands {
 		for _, opt := range cmd.Options {
-			opts[opt.name()] = helpOption{"--" + opt.name(), opt.usage()}
+			if !opt.local() || i == len(usedCommands)-1 {
+				opts[opt.name()] = helpOption{"--" + opt.name(), opt.usage()}
+			}
 		}
 	}
 	optKeys := []string{}
