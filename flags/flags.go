@@ -201,6 +201,10 @@ func (s *Set) Arg(n int) string {
 	return ""
 }
 
+func (s *Set) Args() []string {
+	return s.args
+}
+
 func (s *Set) String(name string, value string, usage string, t *string, optional bool) *string {
 	if t == nil {
 		t = new(string)

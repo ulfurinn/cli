@@ -158,6 +158,7 @@ func (c *Context) setupOptions() {
 func (c *Context) parseOptions() (err error) {
 	err = c.options.Parse(c.args)
 	c.parseError = err
+	c.args = c.options.Args()
 	return
 }
 
