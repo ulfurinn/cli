@@ -182,8 +182,8 @@ func (s *Set) Parse(args []string) (err error) {
 		}
 	}
 	for _, opt := range positional {
+		s.MissingValue = positional[0]
 		if !opt.Optional {
-			s.MissingValue = positional[0]
 			return fmt.Errorf("no value provided for argument %s", s.MissingValue.Name)
 		}
 	}
