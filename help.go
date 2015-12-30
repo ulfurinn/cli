@@ -56,6 +56,13 @@ func init() {
 	}
 }
 
+func Help(ctx *Context) error {
+	tpl, _ := template.New("help").Parse(tplSource)
+	helpCtx := helpContext{}
+	helpCtx.setup(ctx)
+	return tpl.Execute(ctx.app.Out, helpCtx)
+}
+
 func helpCommandAction(ctx *Context) error {
 	tpl, _ := template.New("help").Parse(tplSource)
 	helpCtx := helpContext{}
