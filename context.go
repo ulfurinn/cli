@@ -127,7 +127,7 @@ func (c *Context) run() (err error) {
 		if c.Command().Action != nil {
 			err = c.Command().Action(c)
 		} else if len(c.Command().Commands) > 0 {
-			err = Help(c)
+			err = helpCommandAction(c)
 		}
 	}
 
