@@ -172,7 +172,7 @@ func TestApp(t *testing.T) {
 			Convey("Using a subcommand", func() {
 				Convey("Root", func() {
 					app.Run([]string{"help"})
-					So(b.String(), ShouldEqual, "\nUsage: testapp\n\napp usage\n\nSubcommands:\n  cmd1    cmd1 usage\n  cmd2\n  help\n\nOptions:\n  --int       default = 0\n  --string    default = \"\"\n")
+					So(b.String(), ShouldEqual, "\nUsage: testapp\n\napp usage\n\nSubcommands:\n  cmd1             cmd1 usage\n  cmd2         \n  help         \n  help-commands\n\nOptions:\n  --int       default = 0\n  --string    default = \"\"\n")
 				})
 				Convey("Subcommand", func() {
 					app.Run([]string{"help", "cmd1"})
@@ -182,7 +182,7 @@ func TestApp(t *testing.T) {
 			Convey("Using an option", func() {
 				Convey("Root", func() {
 					app.Run([]string{"--help"})
-					So(b.String(), ShouldEqual, "\nUsage: testapp\n\napp usage\n\nSubcommands:\n  cmd1    cmd1 usage\n  cmd2\n  help\n\nOptions:\n  --int       default = 0\n  --string    default = \"\"\n")
+					So(b.String(), ShouldEqual, "\nUsage: testapp\n\napp usage\n\nSubcommands:\n  cmd1             cmd1 usage\n  cmd2         \n  help         \n  help-commands\n\nOptions:\n  --int       default = 0\n  --string    default = \"\"\n")
 				})
 				Convey("Subcommand", func() {
 					app.Run([]string{"cmd1", "--help"})
