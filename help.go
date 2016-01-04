@@ -47,12 +47,17 @@ var HelpOption = BoolOption{
 }
 
 var HelpCommand Command
+var HelpTreeCommand Command
 
 func init() {
 	HelpCommand = Command{
 		Name:       "help",
 		Action:     helpCommandAction,
 		Completion: helpCompletion,
+	}
+	HelpTreeCommand = Command{
+		Name:   "help-commands",
+		Action: helpTreeCommandAction,
 	}
 }
 
@@ -68,6 +73,36 @@ func helpCommandAction(ctx *Context) error {
 	helpCtx := helpContext{}
 	helpCtx.setupCommand(ctx)
 	return tpl.Execute(ctx.app.Out, helpCtx)
+}
+
+func helpTreeCommandAction(ctx *Context) error {
+	expanded := ctx.app.Main.expanded()
+	names := []string{}
+	longest := 0
+	for cmd := range expanded {
+		if expanded[cmd].Action == nil || cmd == " help" || cmd == " help-commands" {
+			continue
+		}
+		prefix := ctx.app.Name + cmd
+		if len(prefix) > longest {
+			longest = len(prefix)
+		}
+		names = append(names, cmd)
+	}
+	sort.Strings(names)
+	for _, cmd := range names {
+		if expanded[cmd].Action == nil || cmd == " help" || cmd == " help-commands" {
+			continue
+		}
+		prefix := ctx.app.Name + cmd
+		padding := longest - len(prefix) + 2
+		fmt.Print(prefix)
+		for i := 0; i < padding; i++ {
+			fmt.Print(" ")
+		}
+		fmt.Println("#", expanded[cmd].Usage)
+	}
+	return nil
 }
 
 func helpOptionAction(ctx *Context) error {

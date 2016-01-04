@@ -46,13 +46,34 @@ func (c *Command) FindCommand(ctx *Context) {
 	}
 }
 
-func (c *Command) appendHelp() {
-	for _, com := range c.Commands {
-		if com.HasName("help") {
-			return
+func (c *Command) expanded() map[string]Command {
+	result := map[string]Command{}
+	for _, subc := range c.Commands {
+		for k, v := range subc.expanded() {
+			result[c.Name+" "+k] = v
 		}
 	}
-	c.Commands = append(c.Commands, HelpCommand)
+	result[c.Name] = *c
+	return result
+}
+
+func (c *Command) appendHelp() {
+	hasHelp := false
+	hasHelpCommands := false
+	for _, com := range c.Commands {
+		if com.HasName("help") {
+			hasHelp = true
+		}
+		if com.HasName("help-commands") {
+			hasHelpCommands = true
+		}
+	}
+	if !hasHelp {
+		c.Commands = append(c.Commands, HelpCommand)
+	}
+	if !hasHelpCommands {
+		c.Commands = append(c.Commands, HelpTreeCommand)
+	}
 }
 
 func (c *Command) showCompletion(ctx *Context) {
@@ -72,7 +93,7 @@ func (c *Command) showCompletion(ctx *Context) {
 	}
 	list := []string{}
 	for _, cmd := range c.Commands {
-		if cmd.Name != "help" {
+		if cmd.Name != "help" && cmd.Name != "help-commands" {
 			list = append(list, cmd.Name, cmd.ShortName)
 		}
 	}
